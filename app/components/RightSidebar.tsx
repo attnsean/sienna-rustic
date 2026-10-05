@@ -1366,11 +1366,11 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         </section>
 
         {/* ===================================================================== */}
-        {/* SECTION 10 - TERIMA KASIH & FOOTER (Matching Referensi Gambar 5) */}
+        {/* SECTION 10 - TERIMA KASIH & CLOSING (Aesthetic Redesign) */}
         {/* ===================================================================== */}
         <section 
           id="closing-section"
-          className="relative w-full pt-14 pb-0 overflow-hidden select-none bg-[#f5ede2]"
+          className="relative w-full pt-16 pb-0 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
           <div 
@@ -1390,94 +1390,158 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-12">
-            {/* Arch Photo Dome */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 25 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.7, ease: "easeOut" }}
-              className="relative mx-auto mb-6 w-[210px] sm:w-[230px] aspect-square flex items-center justify-center"
-            >
-              {/* Floral Wings Wrapper with bottom-clipping */}
-              <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
-                <img 
-                  src="/assets/template/arch-wing-left.png" 
-                  alt="Floral Wing Left" 
-                  className="absolute -left-[68px] sm:-left-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none" 
-                />
-                <img 
-                  src="/assets/template/arch-wing-right.png" 
-                  alt="Floral Wing Right" 
-                  className="absolute -right-[68px] sm:-right-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none" 
-                />
-              </div>
-
-              {/* Arch Photo Dome */}
-              <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
-                <img 
-                  src={coverPhoto} 
-                  alt={`${brideNickname} & ${groomNickname}`} 
-                  className="w-full h-full object-cover object-top" 
-                />
-              </div>
-            </motion.div>
-
-            {/* Title & Thank You Note */}
+          <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-14">
+            
+            {/* Main Aesthetic Card Container */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.3 }}
-              transition={{ duration: 0.65, ease: "easeOut" }}
-              className="space-y-4"
+              viewport={{ once: false, amount: 0.2 }}
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              className="relative rounded-[2rem] p-6 sm:p-8 bg-white/70 backdrop-blur-md border border-[#8A4B32]/20 shadow-2xl space-y-6"
             >
-              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
-                Terima Kasih
-              </h3>
-              <p className="font-sr-sans text-xs sm:text-sm text-[#5C4A40] leading-relaxed px-2">
-                Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i, berkenan hadir dan memberikan do&apos;a restu kepada kami.
+              {/* Arch Photo Dome with Animated Floral Wings */}
+              <div className="relative mx-auto w-[205px] sm:w-[225px] aspect-square flex items-center justify-center">
+                {/* Floral Wings with bottom-clipping */}
+                <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
+                  <motion.img 
+                    src="/assets/template/arch-wing-left.png" 
+                    alt="Floral Wing Left" 
+                    className="absolute -left-[68px] sm:-left-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-right" 
+                    animate={{
+                      rotate: [-1.2, 1.5, -1.2],
+                      y: [0, -3.5, 0],
+                      x: [0, -1.5, 0],
+                    }}
+                    transition={{
+                      duration: 5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  />
+                  <motion.img 
+                    src="/assets/template/arch-wing-right.png" 
+                    alt="Floral Wing Right" 
+                    className="absolute -right-[68px] sm:-right-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-left" 
+                    animate={{
+                      rotate: [1.5, -1.2, 1.5],
+                      y: [0, -3.5, 0],
+                      x: [0, 1.5, 0],
+                    }}
+                    transition={{
+                      duration: 5.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                      delay: 0.6,
+                    }}
+                  />
+                </div>
+
+                {/* Arch Photo Dome */}
+                <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
+                  <img 
+                    src={coverPhoto} 
+                    alt={`${brideNickname} & ${groomNickname}`} 
+                    className="w-full h-full object-cover object-top" 
+                  />
+                </div>
+              </div>
+
+              {/* Title & Ornamental Flourish */}
+              <div className="space-y-2">
+                <h3 className="font-sr-script text-5xl sm:text-6xl text-[#8A4B32] font-semibold drop-shadow-sm">
+                  Terima Kasih
+                </h3>
+                <div className="flex items-center justify-center gap-2 text-[#8A4B32]/40 text-xs">
+                  <span className="w-8 h-[1px] bg-[#8A4B32]/30" />
+                  <span>✦ ✦ ✦</span>
+                  <span className="w-8 h-[1px] bg-[#8A4B32]/30" />
+                </div>
+              </div>
+
+              {/* Gratitude Message */}
+              <p className="font-sr-sans text-xs sm:text-[13px] text-[#5C4A40] leading-relaxed italic font-light px-1">
+                &quot;Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan do&apos;a restu kepada kami.&quot;
               </p>
-              <p className="font-sr-sans text-xs font-semibold text-[#3C2A21] pt-1">
-                Wassalamu&apos;alaikum warahmatullahi wabarakatuh
-              </p>
-              <div className="pt-2">
-                <span className="font-sr-sans text-xs text-[#6E5D53]">Kami Yang Berbahagia</span>
-                <h4 className="font-sr-script text-3xl sm:text-4xl text-[#8A4B32] font-semibold mt-1">
+
+              {/* Salam Penutup */}
+              <div className="pt-1 border-t border-[#8A4B32]/15">
+                <p className="font-sr-sans text-[11px] font-bold tracking-wider uppercase text-[#3C2A21] pt-3">
+                  Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh
+                </p>
+              </div>
+
+              {/* Sign-off & Couple Names */}
+              <div className="pt-2 space-y-1">
+                <span className="font-sr-sans text-[11px] font-medium tracking-wide text-[#7C6A60] uppercase">
+                  Kami Yang Berbahagia
+                </span>
+                <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold drop-shadow-sm">
                   {brideNickname} &amp; {groomNickname}
                 </h4>
               </div>
             </motion.div>
+
           </div>
 
-          {/* Footer Branding Matching Reference */}
-          <footer className="relative z-20 bg-[#8A4B32] text-white pt-8 pb-24 text-center px-4">
-            <div className="max-w-xs mx-auto space-y-3">
-              {/* Brand Logo */}
-              <div className="inline-flex items-center gap-2 justify-center">
-                <div className="w-6 h-6 rounded-lg bg-[#2DD4BF] flex items-center justify-center text-white font-bold text-xs shadow-sm">
+          {/* Aesthetic Luxury Footer Branding */}
+          <footer className="relative z-20 bg-gradient-to-b from-[#8A4B32] to-[#6E3622] text-white pt-10 pb-16 px-6 text-center shadow-2xl">
+            <div className="max-w-xs mx-auto space-y-5">
+              
+              {/* Brand Pill Badge */}
+              <div className="inline-flex items-center gap-2.5 bg-white/10 hover:bg-white/15 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-md transition-all">
+                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#2DD4BF] to-[#14B8A6] flex items-center justify-center text-white font-bold text-xs shadow-inner">
                   S
                 </div>
-                <span className="font-sans font-semibold text-sm tracking-wide text-white">SeraStory</span>
+                <div className="text-left leading-none">
+                  <span className="font-sans font-bold text-sm tracking-wide text-white block">SeraStory</span>
+                  <span className="font-sr-sans text-[8px] text-white/75 tracking-wider uppercase">Bespoke Digital Invitation</span>
+                </div>
               </div>
 
-              {/* Social Links */}
-              <div className="flex items-center justify-center gap-3 text-[11px] text-white/90 font-sr-sans pt-1">
-                <a href="https://instagram.com/serastory.id" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
-                  📸 serastory.id
+              {/* Contact Pill Badges */}
+              <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                <a 
+                  href="https://instagram.com/serastory.id" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                >
+                  <span>📸</span>
+                  <span>serastory.id</span>
                 </a>
-                <span>•</span>
-                <a href="https://wa.me/6285189970998" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
-                  💬 085189970998
+
+                <a 
+                  href="https://wa.me/6285189970998" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                >
+                  <span>💬</span>
+                  <span>085189970998</span>
                 </a>
-                <span>•</span>
-                <a href="https://tiktok.com/@serastory.id" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
-                  🎵 serastory.id
+
+                <a 
+                  href="https://tiktok.com/@serastory.id" 
+                  target="_blank" 
+                  rel="noreferrer" 
+                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                >
+                  <span>🎵</span>
+                  <span>serastory.id</span>
                 </a>
               </div>
 
-              <p className="font-sr-sans text-[10px] tracking-[0.25em] uppercase text-white/70 pt-2 font-medium">
-                HUBUNGI KAMI
-              </p>
+              {/* Footer Note */}
+              <div className="pt-3 border-t border-white/15 space-y-1">
+                <p className="font-sr-sans text-[10px] tracking-[0.25em] uppercase text-white/80 font-medium">
+                  HUBUNGI KAMI UNTUK UNDANGAN PERNIKAHAN ANDA
+                </p>
+                <p className="font-sr-sans text-[9px] text-white/50 tracking-wider">
+                  © 2026 SeraStory. All Rights Reserved.
+                </p>
+              </div>
+
             </div>
           </footer>
         </section>
