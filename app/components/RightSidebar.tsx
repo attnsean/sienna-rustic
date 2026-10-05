@@ -227,13 +227,13 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
             />
 
-            {/* Animated Floral Corners - Section 2 4 corners anchored neatly */}
+            {/* Animated Floral Corners - Section 2 (Enlarged and framing the arch photo like reference) */}
             <div className="absolute top-0 left-0 pointer-events-none z-10">
               <div className="animate-sr-pulse origin-top-left">
                 <img 
                   src="/assets/template/SR-02.png" 
                   alt="Floral" 
-                  className="w-16 sm:w-20 h-auto object-contain select-none" 
+                  className="w-32 sm:w-36 md:w-40 h-auto object-contain select-none" 
                 />
               </div>
             </div>
@@ -242,7 +242,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-01.png" 
                   alt="Floral" 
-                  className="w-10 sm:w-14 h-auto object-contain select-none" 
+                  className="w-20 sm:w-24 md:w-28 h-auto object-contain select-none" 
                 />
               </div>
             </div>
@@ -251,7 +251,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-01.png" 
                   alt="Floral" 
-                  className="w-10 sm:w-14 h-auto object-contain select-none rotate-180" 
+                  className="w-24 sm:w-28 md:w-32 h-auto object-contain select-none rotate-180" 
                 />
               </div>
             </div>
@@ -260,7 +260,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-03.png" 
                   alt="Floral" 
-                  className="w-16 sm:w-20 h-auto object-contain select-none" 
+                  className="w-32 sm:w-36 md:w-40 h-auto object-contain select-none" 
                 />
               </div>
             </div>
@@ -358,18 +358,42 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
             />
 
-            {/* Floral Corners */}
-            <div className="absolute top-0 left-0 w-36 sm:w-48 h-auto pointer-events-none z-10 animate-sr-pulse">
-              <img src="/assets/template/SR-01.png" alt="Floral" className="w-full h-auto object-contain" />
+            {/* Floral Corners - Correct matching assets, natural flush borders, no flat cutouts */}
+            <div className="absolute top-0 left-0 pointer-events-none z-10">
+              <div className="animate-sr-pulse origin-top-left">
+                <img 
+                  src="/assets/template/SR-02.png" 
+                  alt="Floral" 
+                  className="w-32 sm:w-40 md:w-44 h-auto object-contain select-none" 
+                />
+              </div>
             </div>
-            <div className="absolute top-0 right-0 w-36 sm:w-48 h-auto pointer-events-none z-10 animate-sr-pulse-delay scale-x-[-1]">
-              <img src="/assets/template/SR-01.png" alt="Floral" className="w-full h-auto object-contain" />
+            <div className="absolute top-0 right-0 pointer-events-none z-10">
+              <div className="animate-sr-pulse-delay origin-top-right">
+                <img 
+                  src="/assets/template/SR-01.png" 
+                  alt="Floral" 
+                  className="w-20 sm:w-24 md:w-28 h-auto object-contain select-none" 
+                />
+              </div>
             </div>
-            <div className="absolute bottom-0 left-0 w-36 sm:w-48 h-auto pointer-events-none z-10 animate-sr-pulse-alt">
-              <img src="/assets/template/SR-02.png" alt="Floral" className="w-full h-auto object-contain" />
+            <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+              <div className="animate-sr-pulse-alt origin-bottom-left">
+                <img 
+                  src="/assets/template/SR-01.png" 
+                  alt="Floral" 
+                  className="w-24 sm:w-28 md:w-32 h-auto object-contain select-none rotate-180" 
+                />
+              </div>
             </div>
-            <div className="absolute bottom-0 right-0 w-36 sm:w-48 h-auto pointer-events-none z-10 animate-sr-pulse scale-x-[-1]">
-              <img src="/assets/template/SR-02.png" alt="Floral" className="w-full h-auto object-contain" />
+            <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+              <div className="animate-sr-pulse origin-bottom-right">
+                <img 
+                  src="/assets/template/SR-03.png" 
+                  alt="Floral" 
+                  className="w-32 sm:w-40 md:w-44 h-auto object-contain select-none" 
+                />
+              </div>
             </div>
 
             <div className="relative z-20 max-w-sm mx-auto text-center space-y-8 bg-white/70 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-[#8A4B32]/15 shadow-xl">
