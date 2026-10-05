@@ -312,7 +312,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {/* INVITATION CONTENT */}
       {/* Animasi per widget muncul secara individu, bukan langsung full per section */}
       {/* ========================================================================= */}
-      <div className="relative min-h-[100dvh] pb-24">
+      <div className="relative min-h-[100dvh] pb-0">
         
         {/* ===================================================================== */}
         {/* SECTION 2 - HERO & COUNTDOWN (Bunga di-rotate 180 persis Gambar 3) */}
@@ -1474,14 +1474,22 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           <footer className="relative z-20 bg-gradient-to-b from-[#632E1A] via-[#4D2313] to-[#331509] text-white pt-10 pb-24 px-6 text-center shadow-2xl border-t border-[#D4A373]/25">
             <div className="max-w-sm mx-auto space-y-5">
               
-              {/* Brand Logo & Monogram */}
+              {/* Official SeraStory Brand Logo */}
               <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#2B1006] border border-[#E6C280]/60 ring-2 ring-[#E6C280]/20 flex items-center justify-center shadow-lg">
-                  <span className="font-serif font-bold text-lg text-[#F5EDE2] tracking-normal">S</span>
+                <div className="h-16 w-auto flex items-center justify-center">
+                  <img 
+                    src="/logo-white.png" 
+                    alt="SeraStory Logo" 
+                    className="h-full w-auto object-contain filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] opacity-95" 
+                  />
                 </div>
                 <div className="text-center space-y-0.5">
-                  <h4 className="font-serif font-bold text-base tracking-[0.2em] text-[#FAF5F0]">SERASTORY</h4>
-                  <p className="font-sr-sans text-[9px] tracking-[0.26em] text-[#E6C280]/80 uppercase font-medium">Bespoke Digital Invitation</p>
+                  <h4 className="font-serif font-bold text-base tracking-[0.25em] text-[#FAF5F0] uppercase">
+                    SERASTORY
+                  </h4>
+                  <p className="font-sr-sans text-[9px] tracking-[0.28em] text-[#E6C280]/85 uppercase font-medium">
+                    Bespoke Digital Invitation
+                  </p>
                 </div>
               </div>
 
@@ -1513,17 +1521,19 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   <span>085189970998</span>
                 </a>
 
-                {/* TikTok */}
+                {/* Website */}
                 <a 
-                  href="https://tiktok.com/@serastory.id" 
+                  href="https://serastory.com" 
                   target="_blank" 
                   rel="noreferrer" 
                   className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-[#E6C280]/25 hover:border-[#E6C280]/60 transition-all text-[#FAF5F0] text-xs font-medium shadow-sm hover:scale-[1.03] active:scale-95"
                 >
-                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .591.044.87.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.82 4.48 6.3 6.3 0 0 0 1.86-4.48v-6.9a8.16 8.16 0 0 0 4.91 1.63v-3.7z"/>
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
                   </svg>
-                  <span>serastory.id</span>
+                  <span>serastory.com</span>
                 </a>
               </div>
 
@@ -1551,8 +1561,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </div>
 
             </div>
-          </footer>
-        </section>
+          </footer></section>
 
       </div>
 
@@ -1561,21 +1570,49 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {/* ===================================================================== */}
       {isOpened && (
         <>
-          {/* Floating Rotating Music Disc */}
-          <div className="fixed bottom-6 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-end px-4 sm:px-6">
+          {/* Floating Rotating Music Disc (Rustic Luxury Vinyl Player) */}
+          <div className="fixed bottom-6 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-end px-5 sm:px-6">
             <button
               type="button"
               onClick={toggleMusic}
-              aria-label="Toggle Music"
-              className="pointer-events-auto w-11 h-11 rounded-full bg-[#1A1A1A] border-2 border-[#8A4B32] shadow-2xl flex items-center justify-center cursor-pointer group active:scale-90 transition-transform"
+              aria-label={isPlayingMusic ? "Jeda Musik" : "Putar Musik"}
+              className="pointer-events-auto relative group active:scale-95 transition-transform duration-200"
             >
-              <div className={`w-8 h-8 rounded-full bg-[#8A4B32] flex items-center justify-center ${isPlayingMusic ? "animate-sr-spin" : ""}`}>
-                <span className="text-white text-xs">🎵</span>
+              {/* Outer Golden Aura Pulse when playing */}
+              {isPlayingMusic && (
+                <span className="absolute -inset-1 rounded-full bg-[#D4A373]/35 animate-ping opacity-60 pointer-events-none" />
+              )}
+
+              {/* Realistic Vinyl Disc Body */}
+              <div 
+                className={`relative w-12 h-12 rounded-full bg-[#181310] border-2 border-[#D4A373] shadow-[0_8px_24px_rgba(43,16,6,0.5)] flex items-center justify-center overflow-hidden transition-all duration-300 group-hover:scale-105 group-hover:border-[#E6C280] ${
+                  isPlayingMusic ? "animate-sr-spin" : ""
+                }`}
+              >
+                {/* Concentric Vinyl Grooves */}
+                <div className="absolute inset-[3px] rounded-full border border-white/[0.08] pointer-events-none" />
+                <div className="absolute inset-[7px] rounded-full border border-white/[0.05] pointer-events-none" />
+
+                {/* Center Record Label (Warm Terracotta with Gold Ring) */}
+                <div className="relative w-5 h-5 rounded-full bg-gradient-to-br from-[#8A4B32] via-[#6D341F] to-[#451C0E] border border-[#E6C280]/60 flex items-center justify-center shadow-inner">
+                  {/* Center Spindle Hole & Musical Note SVG */}
+                  <svg 
+                    className="w-2.5 h-2.5 text-[#FAF5F0] filter drop-shadow-[0_1px_1px_rgba(0,0,0,0.6)]" 
+                    viewBox="0 0 24 24" 
+                    fill="currentColor"
+                  >
+                    <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Tooltip on Hover */}
+              <div className="absolute -top-7 right-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none bg-[#2B1006]/90 text-[#F5EDE2] text-[9px] tracking-wider font-sr-sans px-2 py-0.5 rounded-md border border-[#E6C280]/30 shadow-md whitespace-nowrap uppercase">
+                {isPlayingMusic ? "Jeda Musik" : "Putar Musik"}
               </div>
             </button>
           </div>
-
-        </>
+</>
       )}
 
     </div>
