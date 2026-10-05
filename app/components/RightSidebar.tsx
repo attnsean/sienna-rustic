@@ -230,8 +230,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   return (
     <div 
       ref={containerRef}
-      className={`w-full md:w-[38%] lg:w-[35%] xl:w-[32%] min-h-[100dvh] md:h-[100dvh] ${
-        isOpened ? "overflow-y-auto" : "overflow-hidden"
+      className={`w-full md:w-[38%] lg:w-[35%] xl:w-[32%] ${
+        isOpened ? "min-h-[100dvh] md:h-[100dvh] overflow-y-auto" : "h-[100dvh] max-h-[100dvh] overflow-hidden"
       } md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl shrink-0 scroll-smooth`}
     >
       {/* Background Audio Player */}
@@ -252,7 +252,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           initial={{ y: "0%" }}
           animate={{ y: isOpened ? "-100%" : "0%" }}
           transition={{ duration: 0.85, ease: [0.65, 0, 0.35, 1] }}
-          className="absolute inset-0 z-50 min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]"
+          className="fixed md:absolute inset-0 z-50 h-[100dvh] max-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Base parchment background texture */}
           <div 
@@ -296,7 +296,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
 
           {/* Spacer to push content down onto the parchment */}
-          <div className="relative z-10 flex-1 min-h-[44vh]" />
+          <div className="relative z-10 flex-1 min-h-[36vh] sm:min-h-[40vh]" />
 
           {/* Center Info on Cover */}
           <div className="relative z-20 w-full max-w-xs space-y-2.5 pt-1">
@@ -344,7 +344,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {/* INVITATION CONTENT */}
       {/* Animasi per widget muncul secara individu, bukan langsung full per section */}
       {/* ========================================================================= */}
-      <div className="relative min-h-[100dvh] pb-0">
+      <div className={`relative ${isOpened ? "min-h-[100dvh] pb-0" : "h-0 overflow-hidden opacity-0 pointer-events-none"}`}>
         
         {/* ===================================================================== */}
         {/* SECTION 2 - HERO & COUNTDOWN (Bunga di-rotate 180 persis Gambar 3) */}
