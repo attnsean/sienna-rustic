@@ -9,6 +9,7 @@ export const revalidate = 0;
 
 type Props = {
   params: Promise<{ name?: string[] }>;
+  searchParams?: Promise<{ [key: string]: string | string[] | undefined }>;
 };
 
 const formatFallbackGuestName = (raw: string): string => {
@@ -31,8 +32,13 @@ const formatFallbackGuestName = (raw: string): string => {
     .join(" ");
 };
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
+  const requestedProject = typeof resolvedSearch.project === 'string' 
+    ? resolvedSearch.project 
+    : (typeof resolvedSearch.project_id === 'string' ? resolvedSearch.project_id : undefined);
+
   let guestName = "Tamu Undangan";
   const lastParam = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[resolvedParams.name.length - 1] : undefined;
   const slug = lastParam || (resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined);
@@ -40,7 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const headersList = await headers();
   const host = headersList.get("host") || undefined;
 
-  const dbData = await resolveProjectData(slug, host);
+  const dbData = await resolveProjectData(slug, host, requestedProject);
 
   if (dbData.guest) {
     guestName = dbData.guest.name;
@@ -84,8 +90,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function Home({ params }: Props) {
+export default async function Home({ params, searchParams }: Props) {
   const resolvedParams = await params;
+  const resolvedSearch = searchParams ? await searchParams : {};
+  const requestedProject = typeof resolvedSearch.project === 'string' 
+    ? resolvedSearch.project 
+    : (typeof resolvedSearch.project_id === 'string' ? resolvedSearch.project_id : undefined);
+
   let guestName = "Tamu Undangan";
   const lastParam = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[resolvedParams.name.length - 1] : undefined;
   const slug = lastParam || (resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined);
@@ -93,7 +104,7 @@ export default async function Home({ params }: Props) {
   const headersList = await headers();
   const host = headersList.get("host") || undefined;
 
-  const dbData = await resolveProjectData(slug, host);
+  const dbData = await resolveProjectData(slug, host, requestedProject);
 
   // Check project status
   const isLive = dbData.project ? dbData.project.status === "live" : true;

@@ -159,7 +159,7 @@ export interface ResolvedData {
   };
 }
 
-export async function resolveProjectData(slug?: string, host?: string): Promise<ResolvedData> {
+export async function resolveProjectData(slug?: string, host?: string, requestedProject?: string): Promise<ResolvedData> {
   const result: ResolvedData = {
     guest: null,
     project: null,
@@ -174,8 +174,20 @@ export async function resolveProjectData(slug?: string, host?: string): Promise<
       projectId = '';
     }
 
-    // 1. Resolve guest by slug if provided
-    if (slug) {
+    // 0. Resolve directly by requestedProject (project_id or project_name from query/param)
+    if (requestedProject) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(requestedProject);
+      const query = supabase.from('projects').select('id');
+      const { data: matched } = isUuid 
+        ? await query.eq('id', requestedProject).maybeSingle()
+        : await query.eq('project_name', requestedProject.toLowerCase()).maybeSingle();
+      if (matched) {
+        projectId = matched.id;
+      }
+    }
+
+    // 1. Resolve guest by slug if provided, or check if slug is project_name
+    if (!projectId && slug) {
       const { data: guestData, error: guestError } = await supabase
         .from('guests')
         .select('*')
@@ -185,6 +197,15 @@ export async function resolveProjectData(slug?: string, host?: string): Promise<
       if (guestData && !guestError) {
         result.guest = guestData;
         projectId = guestData.project_id;
+      } else {
+        const { data: projByName } = await supabase
+          .from('projects')
+          .select('id')
+          .eq('project_name', slug.toLowerCase())
+          .maybeSingle();
+        if (projByName) {
+          projectId = projByName.id;
+        }
       }
     }
 
