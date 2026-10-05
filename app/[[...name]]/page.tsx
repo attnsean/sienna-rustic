@@ -141,27 +141,15 @@ export default async function Home({ params }: Props) {
   const coverPhoto = dbData.project?.cover_photo_url || dbData.project?.opening_photo_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop";
 
   return (
-    <main className="min-h-[100dvh] w-full flex flex-col md:flex-row bg-[#e8ded1] text-[#3C2A21] overflow-hidden relative">
+    <main className="min-h-[100dvh] md:h-[100dvh] w-full flex flex-col md:flex-row bg-[#e8ded1] text-[#3C2A21] md:overflow-hidden relative">
       
-      {/* Gambar ke-1: Left side Desktop 2-Column Cover (Hidden on mobile) */}
-      <aside className="hidden md:flex relative md:w-[50%] lg:w-[55%] xl:w-[58%] md:h-[100dvh] sticky top-0 items-center justify-center overflow-hidden bg-[#f5ede2] border-r border-[#8A4B32]/20 select-none">
-        {/* Layer 1: User's prewedding photo as FULL background */}
-        <div className="absolute inset-0 pointer-events-none z-0 select-none">
-          <img 
-            src={coverPhoto} 
-            alt="Prewedding" 
-            className="w-full h-full object-cover object-center"
-          />
-        </div>
-
-        {/* Layer 2: Parchment texture overlay with opacity */}
+      {/* Gambar ke-1: Left side Desktop 2-Column Cover (Hidden on mobile, Fixed on Desktop) */}
+      <aside className="hidden md:flex relative md:w-[50%] lg:w-[55%] xl:w-[58%] md:h-[100dvh] shrink-0 items-center justify-center overflow-hidden bg-[#f5ede2] border-r border-[#8A4B32]/20 select-none">
+        {/* Layer 1: Parchment texture background */}
         <div 
-          className="absolute inset-0 pointer-events-none z-[1] select-none opacity-60"
-          style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
+          className="absolute inset-0 pointer-events-none z-0 select-none bg-cover bg-center opacity-95"
+          style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
         />
-
-        {/* Layer 3: Gradient for text readability */}
-        <div className="absolute inset-0 pointer-events-none z-[2] bg-gradient-to-b from-transparent via-[#f5ede2]/20 to-[#f5ede2]/60" />
 
         {/* Animated Floral Corners (Zoom in Zoom out) - Exact placement matching Gambar 1 */}
         {/* Top-Left: SR-02.png flush in top-0 left-0 */}

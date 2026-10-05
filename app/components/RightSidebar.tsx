@@ -112,7 +112,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   };
 
   return (
-    <div className="w-full md:w-[50%] lg:w-[45%] xl:w-[42%] min-h-[100dvh] relative bg-[#f5ede2] text-[#3C2A21] overflow-y-auto shadow-2xl">
+    <div className="w-full md:w-[50%] lg:w-[45%] xl:w-[42%] min-h-[100dvh] md:h-[100dvh] md:overflow-y-auto md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl flex-1 shrink-0">
       {/* Background Audio Player */}
       <audio 
         ref={audioRef} 
@@ -455,42 +455,46 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </section>
 
           {/* ===================================================================== */}
-          {/* FLOATING CONTROLS: MUSIC & BOTTOM NAV */}
+          {/* FLOATING CONTROLS: MUSIC & BOTTOM NAV (Pinned strictly to Right Sidebar) */}
           {/* ===================================================================== */}
-          {/* Floating Rotating Music Disc in Bottom-Right */}
-          <button
-            type="button"
-            onClick={toggleMusic}
-            aria-label="Toggle Music"
-            className="fixed bottom-20 right-4 sm:right-6 z-50 w-11 h-11 rounded-full bg-[#1A1A1A] border-2 border-[#8A4B32] shadow-2xl flex items-center justify-center cursor-pointer group active:scale-90 transition-transform"
-          >
-            <div className={`w-8 h-8 rounded-full bg-[#8A4B32] flex items-center justify-center ${isPlayingMusic ? "animate-sr-spin" : ""}`}>
-              <span className="text-white text-xs">🎵</span>
-            </div>
-          </button>
+          {/* Floating Rotating Music Disc */}
+          <div className="fixed bottom-20 z-50 pointer-events-none w-full md:w-[50%] lg:w-[45%] xl:w-[42%] right-0 flex justify-end px-4 sm:px-6">
+            <button
+              type="button"
+              onClick={toggleMusic}
+              aria-label="Toggle Music"
+              className="pointer-events-auto w-11 h-11 rounded-full bg-[#1A1A1A] border-2 border-[#8A4B32] shadow-2xl flex items-center justify-center cursor-pointer group active:scale-90 transition-transform"
+            >
+              <div className={`w-8 h-8 rounded-full bg-[#8A4B32] flex items-center justify-center ${isPlayingMusic ? "animate-sr-spin" : ""}`}>
+                <span className="text-white text-xs">🎵</span>
+              </div>
+            </button>
+          </div>
 
-          {/* Floating Bottom Navigation Bar */}
-          <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 bg-[#8A4B32]/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-2">
-            {[
-              { id: "hero-section", icon: "🏠", label: "Home" },
-              { id: "couple-section", icon: "🤍", label: "Mempelai" },
-              { id: "ayat-section", icon: "📖", label: "Ayat" },
-            ].map((item) => (
-              <button
-                key={item.id}
-                type="button"
-                onClick={() => scrollToSection(item.id)}
-                className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base transition-all ${
-                  activeNav === item.id 
-                    ? "bg-white/25 text-white shadow-inner scale-105" 
-                    : "text-white/80 hover:text-white hover:bg-white/10"
-                }`}
-                title={item.label}
-              >
-                {item.icon}
-              </button>
-            ))}
-          </nav>
+          {/* Floating Bottom Navigation Bar (Centered within Right Sidebar on desktop, never spilling to left) */}
+          <div className="fixed bottom-4 z-50 pointer-events-none w-full md:w-[50%] lg:w-[45%] xl:w-[42%] right-0 flex justify-center px-4">
+            <nav className="pointer-events-auto bg-[#8A4B32]/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-2">
+              {[
+                { id: "hero-section", icon: "🏠", label: "Home" },
+                { id: "couple-section", icon: "🤍", label: "Mempelai" },
+                { id: "ayat-section", icon: "📖", label: "Ayat" },
+              ].map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => scrollToSection(item.id)}
+                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base transition-all ${
+                    activeNav === item.id 
+                      ? "bg-white/25 text-white shadow-inner scale-105" 
+                      : "text-white/80 hover:text-white hover:bg-white/10"
+                  }`}
+                  title={item.label}
+                >
+                  {item.icon}
+                </button>
+              ))}
+            </nav>
+          </div>
 
         </div>
       )}
