@@ -49,7 +49,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   // Countdown timer calculations
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
-  // Gallery State
+  // Gallery State & Debounced Auto-Slide
   const galleryImages = [
     "/assets/template/01-09.png",
     "/assets/template/01-10.png",
@@ -61,6 +61,82 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   ];
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [isUserHovering, setIsUserHovering] = useState(false);
+  const lastUserInteractionRef = useRef<number>(0);
+  const touchStartXRef = useRef<number | null>(null);
+  const thumbnailScrollRef = useRef<HTMLDivElement | null>(null);
+
+  // Register interaction timestamp to debounce auto-slide by 4.5s
+  const registerUserInteraction = () => {
+    lastUserInteractionRef.current = Date.now();
+  };
+
+  const handleNextPhoto = () => {
+    registerUserInteraction();
+    setActivePhotoIdx((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+  };
+
+  const handlePrevPhoto = () => {
+    registerUserInteraction();
+    setActivePhotoIdx((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1));
+  };
+
+  const handleSelectThumbnail = (idx: number) => {
+    registerUserInteraction();
+    setActivePhotoIdx(idx);
+  };
+
+  // Touch Swipe for Mobile Gallery
+  const handleTouchStart = (e: React.TouchEvent) => {
+    registerUserInteraction();
+    setIsUserHovering(true);
+    touchStartXRef.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    setIsUserHovering(false);
+    registerUserInteraction();
+    if (touchStartXRef.current === null) return;
+    const touchEndX = e.changedTouches[0].clientX;
+    const diff = touchStartXRef.current - touchEndX;
+    if (Math.abs(diff) > 40) {
+      if (diff > 0) {
+        handleNextPhoto();
+      } else {
+        handlePrevPhoto();
+      }
+    }
+    touchStartXRef.current = null;
+  };
+
+  // Auto-Slide Effect with Debounce Check
+  useEffect(() => {
+    if (!isOpened || isLightboxOpen) return;
+
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const timeSinceInteraction = now - lastUserInteractionRef.current;
+
+      // Skip slide if user is hovering/touching, or interacted in last 4500ms
+      if (isUserHovering || timeSinceInteraction < 4500) {
+        return;
+      }
+
+      setActivePhotoIdx((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1));
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [isOpened, isLightboxOpen, isUserHovering, galleryImages.length]);
+
+  // Scroll active thumbnail smoothly into view
+  useEffect(() => {
+    if (thumbnailScrollRef.current) {
+      const thumb = thumbnailScrollRef.current.children[activePhotoIdx] as HTMLElement;
+      if (thumb && typeof thumb.scrollIntoView === "function") {
+        thumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+      }
+    }
+  }, [activePhotoIdx]);
 
   // Bank Card Copy State
   const [copiedBankIndex, setCopiedBankIndex] = useState<number | null>(null);
@@ -1110,15 +1186,20 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
           <div className="relative z-20 max-w-sm mx-auto">
             {/* Title */}
-            <motion.h3 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold text-center mb-6"
+              className="text-center space-y-1 mb-6"
             >
-              Our Moments
-            </motion.h3>
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold drop-shadow-sm">
+                Our Moments
+              </h3>
+              <p className="font-sr-sans text-xs text-[#5C4A40] max-w-xs mx-auto">
+                Setiap detik kebersamaan terukir indah dalam cerita kami.
+              </p>
+            </motion.div>
 
             {/* Main Interactive Photo Display */}
             <motion.div 
@@ -1126,20 +1207,52 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.65, ease: "easeOut" }}
+              onMouseEnter={() => {
+                setIsUserHovering(true);
+                registerUserInteraction();
+              }}
+              onMouseLeave={() => {
+                setIsUserHovering(false);
+                registerUserInteraction();
+              }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
               className="relative bg-[#8A4B32] rounded-3xl p-2.5 sm:p-3 shadow-2xl overflow-hidden border border-white/30"
             >
               <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-black/20 group">
-                <img 
-                  src={galleryImages[activePhotoIdx]} 
-                  alt={`Moment ${activePhotoIdx + 1}`} 
-                  className="w-full h-full object-cover transition-all duration-500" 
-                />
+                <AnimatePresence mode="wait">
+                  <motion.img 
+                    key={activePhotoIdx}
+                    src={galleryImages[activePhotoIdx]} 
+                    alt={`Moment ${activePhotoIdx + 1}`} 
+                    initial={{ opacity: 0, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 0.4, ease: "easeInOut" }}
+                    className="w-full h-full object-cover select-none" 
+                  />
+                </AnimatePresence>
+
+                {/* Auto-Slide Progress Dots at Bottom */}
+                <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
+                  {galleryImages.map((_, i) => (
+                    <span 
+                      key={i}
+                      className={`h-1.5 rounded-full transition-all duration-300 ${
+                        activePhotoIdx === i ? "w-5 bg-white shadow-sm" : "w-1.5 bg-white/40"
+                      }`}
+                    />
+                  ))}
+                </div>
 
                 {/* Fullscreen Button */}
                 <button
                   type="button"
-                  onClick={() => setIsLightboxOpen(true)}
-                  className="absolute top-3 left-3 w-8 h-8 rounded-lg bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-sm backdrop-blur-sm transition-all"
+                  onClick={() => {
+                    registerUserInteraction();
+                    setIsLightboxOpen(true);
+                  }}
+                  className="absolute top-3 left-3 w-8 h-8 rounded-lg bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-sm backdrop-blur-sm transition-all z-10 cursor-pointer shadow-md"
                   title="Perbesar Foto"
                 >
                   ⛶
@@ -1148,32 +1261,37 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 {/* Nav Arrows */}
                 <button
                   type="button"
-                  onClick={() => setActivePhotoIdx((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center text-lg transition-all"
+                  onClick={handlePrevPhoto}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/35 hover:bg-black/65 text-white flex items-center justify-center text-lg transition-all z-10 cursor-pointer shadow-md active:scale-90"
+                  aria-label="Foto Sebelumnya"
                 >
                   ‹
                 </button>
                 <button
                   type="button"
-                  onClick={() => setActivePhotoIdx((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center text-lg transition-all"
+                  onClick={handleNextPhoto}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/35 hover:bg-black/65 text-white flex items-center justify-center text-lg transition-all z-10 cursor-pointer shadow-md active:scale-90"
+                  aria-label="Foto Selanjutnya"
                 >
                   ›
                 </button>
               </div>
 
               {/* Thumbnails Row */}
-              <div className="flex gap-2 pt-2.5 overflow-x-auto scrollbar-none px-0.5">
+              <div 
+                ref={thumbnailScrollRef}
+                className="flex gap-2 pt-2.5 overflow-x-auto scrollbar-none px-0.5"
+              >
                 {galleryImages.map((imgUrl, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => setActivePhotoIdx(idx)}
+                    onClick={() => handleSelectThumbnail(idx)}
                     className={`relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
                       activePhotoIdx === idx ? "border-white scale-105 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={imgUrl} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                    <img src={imgUrl} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover select-none" />
                   </button>
                 ))}
               </div>
