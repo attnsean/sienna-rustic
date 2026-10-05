@@ -216,6 +216,23 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const lastUserInteractionRef = useRef<number>(0);
   const touchStartXRef = useRef<number | null>(null);
   const thumbnailScrollRef = useRef<HTMLDivElement | null>(null);
+  const gallerySectionRef = useRef<HTMLElement | null>(null);
+  const [isGalleryInView, setIsGalleryInView] = useState(false);
+
+  // Observe if gallery section is in viewport so auto-slide only runs when user looks at it
+  useEffect(() => {
+    const el = gallerySectionRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        setIsGalleryInView(entry.isIntersecting);
+      },
+      { threshold: 0.15 }
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   // Register interaction timestamp to debounce auto-slide by 4.5s
   const registerUserInteraction = () => {
@@ -260,9 +277,10 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     touchStartXRef.current = null;
   };
 
-  // Auto-Slide Effect with Debounce Check
+  // Auto-Slide Effect with Debounce Check & Viewport Visibility
   useEffect(() => {
-    if (!isOpened || isLightboxOpen) return;
+    // Only auto-slide if wedding invitation is opened, lightbox is closed, and gallery is visible in viewport
+    if (!isOpened || isLightboxOpen || !isGalleryInView) return;
 
     const interval = setInterval(() => {
       const now = Date.now();
@@ -277,15 +295,16 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     }, 3500);
 
     return () => clearInterval(interval);
-  }, [isOpened, isLightboxOpen, isUserHovering, galleryImages.length]);
+  }, [isOpened, isLightboxOpen, isGalleryInView, isUserHovering, galleryImages.length]);
 
-  // Scroll active thumbnail smoothly into view
+  // Scroll active thumbnail smoothly horizontally inside its row without affecting parent/window scroll
   useEffect(() => {
-    if (thumbnailScrollRef.current) {
-      const thumb = thumbnailScrollRef.current.children[activePhotoIdx] as HTMLElement;
-      if (thumb && typeof thumb.scrollIntoView === "function") {
-        thumb.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
-      }
+    const container = thumbnailScrollRef.current;
+    if (!container) return;
+    const thumb = container.children[activePhotoIdx] as HTMLElement;
+    if (thumb) {
+      const targetScrollLeft = thumb.offsetLeft - container.offsetWidth / 2 + thumb.offsetWidth / 2;
+      container.scrollTo({ left: targetScrollLeft, behavior: 'smooth' });
     }
   }, [activePhotoIdx]);
 
@@ -1260,6 +1279,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         {/* ===================================================================== */}
         <section 
           id="gallery-section"
+          ref={gallerySectionRef}
           className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
