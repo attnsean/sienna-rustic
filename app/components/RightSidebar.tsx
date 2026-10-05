@@ -74,15 +74,24 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const [rsvpName, setRsvpName] = useState("");
   const [rsvpMessage, setRsvpMessage] = useState("");
   const [rsvpStatus, setRsvpStatus] = useState<"hadir" | "tidak_hadir">("hadir");
+  const [rsvpPax, setRsvpPax] = useState<number>(1);
   const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
   const [rsvpSuccessMsg, setRsvpSuccessMsg] = useState(false);
 
-  // Wishes List State (Matching user reference image 4 + dynamic entries)
-  const [wishesList, setWishesList] = useState([
-    { name: "Erika", message: "Opiiii selamaaaattt😍 lancar sampai hari h yaaaa❤️", initial: "ER", color: "bg-[#5B8C5A]" },
-    { name: "RAISA 8i N3RIZI", message: "selamat ya pak,semoga lancar sampai hari H'y,semoga jadi keluarga samawa,barokah dan langgeng bahagia dunia akhirat ya....aamiin", initial: "RN", color: "bg-[#56B4D3]" },
-    { name: "Fajar ramadan", message: "Semoga lancar sampai akhir pak🫡", initial: "FR", color: "bg-[#E6C654]" },
-    { name: "rafa", message: "Selamat menempuh hidup baru, semoga bahagia selalu!", initial: "RA", color: "bg-[#8A9BA8]" },
+  // Wishes List State
+  const [wishesList, setWishesList] = useState<{
+    name: string;
+    message: string;
+    initial: string;
+    color: string;
+    attendance?: "hadir" | "tidak_hadir";
+    pax?: number;
+    created_at?: string;
+  }[]>([
+    { name: "Erika", message: "Opiiii selamaaaattt😍 lancar sampai hari h yaaaa❤️", initial: "ER", color: "bg-[#5B8C5A]", attendance: "hadir", pax: 2, created_at: "2 jam yang lalu" },
+    { name: "RAISA 8i N3RIZI", message: "selamat ya pak,semoga lancar sampai hari H'y,semoga jadi keluarga samawa,barokah dan langgeng bahagia dunia akhirat ya....aamiin", initial: "RN", color: "bg-[#8A4B32]", attendance: "hadir", pax: 1, created_at: "4 jam yang lalu" },
+    { name: "Fajar ramadan", message: "Semoga lancar sampai akhir pak🫡", initial: "FR", color: "bg-[#B3784A]", attendance: "hadir", pax: 2, created_at: "Kemarin" },
+    { name: "rafa", message: "Selamat menempuh hidup baru, semoga bahagia selalu!", initial: "RA", color: "bg-[#6E5D53]", attendance: "hadir", pax: 1, created_at: "Kemarin" },
   ]);
 
   const handleSubmitRsvp = async (e: React.FormEvent) => {
@@ -91,6 +100,21 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
     setIsSubmittingRsvp(true);
     try {
+      // 1. Post to RSVP Table
+      await fetch("/api/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_id: project?.id || "default",
+          guest_id: guest?.id || null,
+          guest_name: rsvpName,
+          attendance: rsvpStatus,
+          pax: rsvpStatus === "hadir" ? rsvpPax : 0,
+          message: rsvpMessage,
+        }),
+      });
+
+      // 2. Post to Wishes Table
       await fetch("/api/wishes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -116,13 +140,15 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         message: rsvpMessage,
         initial: initials || "UC",
         color: "bg-[#8A4B32]",
+        attendance: rsvpStatus,
+        pax: rsvpStatus === "hadir" ? rsvpPax : 0,
+        created_at: "Baru saja",
       };
 
       setWishesList((prev) => [newEntry, ...prev]);
-      setRsvpName("");
       setRsvpMessage("");
       setRsvpSuccessMsg(true);
-      setTimeout(() => setRsvpSuccessMsg(false), 3500);
+      setTimeout(() => setRsvpSuccessMsg(false), 4000);
     } catch (err) {
       console.error(err);
     } finally {
@@ -1240,14 +1266,19 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="text-center space-y-1.5"
+              className="text-center space-y-2"
             >
-              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold drop-shadow-sm">
                 Ucapan &amp; RSVP
               </h3>
-              <p className="font-sr-sans text-xs text-[#5C4A40]">
-                Berikan doa dan ucapan terbaik untuk kami.
+              <p className="font-sr-sans text-xs sm:text-[13px] text-[#5C4A40] leading-relaxed">
+                Konfirmasi kehadiran &amp; berikan doa restu terbaik untuk kami.
               </p>
+              <div className="flex items-center justify-center gap-2 text-[#8A4B32]/35 text-xs pt-0.5">
+                <span className="w-8 h-[1px] bg-[#8A4B32]/25" />
+                <span>✦ ✦ ✦</span>
+                <span className="w-8 h-[1px] bg-[#8A4B32]/25" />
+              </div>
             </motion.div>
 
             {/* RSVP Form Card */}
@@ -1256,111 +1287,220 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.65, ease: "easeOut" }}
-              className="relative rounded-3xl p-5 sm:p-6 bg-white/70 backdrop-blur-sm border border-[#8A4B32]/25 shadow-xl space-y-4"
+              className="relative rounded-[28px] p-6 sm:p-7 bg-white/85 backdrop-blur-md border border-[#8A4B32]/20 shadow-xl space-y-5"
             >
-              <form onSubmit={handleSubmitRsvp} className="space-y-3.5">
-                <div>
+              <form onSubmit={handleSubmitRsvp} className="space-y-4">
+                
+                {/* Field 1: Nama Lengkap */}
+                <div className="space-y-1.5 text-left">
+                  <label className="font-sr-sans text-[11px] font-bold uppercase tracking-wider text-[#5C4A40] flex items-center justify-between">
+                    <span>Nama Lengkap</span>
+                    <span className="text-[#8A4B32] text-xs font-normal">*wajib</span>
+                  </label>
                   <input 
                     type="text"
                     required
                     value={rsvpName}
                     onChange={(e) => setRsvpName(e.target.value)}
-                    placeholder="nama" 
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8A4B32]/30 bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/50 focus:outline-none focus:border-[#8A4B32] shadow-inner"
+                    placeholder="Masukkan nama Anda..." 
+                    className="w-full px-4 py-3 rounded-2xl border border-[#D6C5B3] bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/40 focus:outline-none focus:border-[#8A4B32] focus:ring-2 focus:ring-[#8A4B32]/15 shadow-sm transition-all"
                   />
                 </div>
 
-                <div>
+                {/* Field 2: Konfirmasi Kehadiran */}
+                <div className="space-y-2 text-left pt-1">
+                  <label className="font-sr-sans text-[11px] font-bold uppercase tracking-wider text-[#5C4A40] flex items-center justify-between">
+                    <span>Konfirmasi Kehadiran</span>
+                    <span className="text-[#8A4B32] text-xs font-normal">*pilih salah satu</span>
+                  </label>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setRsvpStatus("hadir")}
+                      className={`py-2.5 px-3 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
+                        rsvpStatus === "hadir"
+                          ? "bg-gradient-to-r from-[#8A4B32] to-[#733B26] border-[#8A4B32] text-white shadow-md font-bold scale-[1.01]"
+                          : "bg-white/80 border-[#D6C5B3] text-[#5C4A40] hover:bg-[#F7F2EB]"
+                      }`}
+                    >
+                      <span className="text-sm">✓</span>
+                      <span>Hadir</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setRsvpStatus("tidak_hadir")}
+                      className={`py-2.5 px-3 rounded-2xl text-xs font-semibold flex items-center justify-center gap-2 border transition-all cursor-pointer ${
+                        rsvpStatus === "tidak_hadir"
+                          ? "bg-gradient-to-r from-[#8A4B32] to-[#733B26] border-[#8A4B32] text-white shadow-md font-bold scale-[1.01]"
+                          : "bg-white/80 border-[#D6C5B3] text-[#5C4A40] hover:bg-[#F7F2EB]"
+                      }`}
+                    >
+                      <span className="text-sm">✕</span>
+                      <span>Tidak Hadir</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Field 3: Jumlah Tamu (Pax) - Hanya tampil jika Hadir */}
+                <AnimatePresence>
+                  {rsvpStatus === "hadir" ? (
+                    <motion.div 
+                      key="pax-selector"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25 }}
+                      className="space-y-2 text-left pt-1 overflow-hidden"
+                    >
+                      <div className="flex items-center justify-between">
+                        <label className="font-sr-sans text-[11px] font-bold uppercase tracking-wider text-[#5C4A40]">
+                          Jumlah Orang yang Hadir
+                        </label>
+                        <span className="text-xs font-bold text-[#8A4B32] font-sr-sans bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
+                          {rsvpPax} Orang
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-4 gap-2">
+                        {[1, 2, 3, 4].map((count) => (
+                          <button
+                            key={count}
+                            type="button"
+                            onClick={() => setRsvpPax(count)}
+                            className={`py-2 rounded-xl text-xs font-semibold transition-all border cursor-pointer ${
+                              rsvpPax === count
+                                ? "bg-[#8A4B32] text-white border-[#8A4B32] shadow-sm font-bold scale-[1.02]"
+                                : "bg-white border-[#D6C5B3] text-[#5C4A40] hover:bg-[#F7F2EB]"
+                            }`}
+                          >
+                            {count} Orang
+                          </button>
+                        ))}
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.p 
+                      key="declined-note"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      className="text-[11px] text-[#7C6A60] italic text-left pt-0.5"
+                    >
+                      *Doa restu Anda dari kejauhan tetap sangat berarti bagi kami.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+
+                {/* Field 4: Ucapan & Doa */}
+                <div className="space-y-1.5 text-left pt-1">
+                  <label className="font-sr-sans text-[11px] font-bold uppercase tracking-wider text-[#5C4A40] flex items-center justify-between">
+                    <span>Ucapan &amp; Doa Restu</span>
+                    <span className="text-[#8A4B32] text-xs font-normal">*wajib</span>
+                  </label>
                   <textarea 
                     required
                     rows={3}
                     value={rsvpMessage}
                     onChange={(e) => setRsvpMessage(e.target.value)}
-                    placeholder="Ucapan" 
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8A4B32]/30 bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/50 focus:outline-none focus:border-[#8A4B32] shadow-inner resize-none"
+                    placeholder="Tulis ucapan dan doa restu untuk mempelai..." 
+                    className="w-full px-4 py-3 rounded-2xl border border-[#D6C5B3] bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/40 focus:outline-none focus:border-[#8A4B32] focus:ring-2 focus:ring-[#8A4B32]/15 shadow-sm resize-none transition-all"
                   />
-                </div>
-
-                {/* Divider Line */}
-                <div className="flex items-center gap-2 pt-1 pb-0.5">
-                  <div className="flex-1 h-[1px] bg-[#8A4B32]/25" />
-                  <span className="font-sr-sans text-[11px] font-semibold text-[#8A4B32] whitespace-nowrap">
-                    Konfirmasi Kehadiran
-                  </span>
-                  <div className="flex-1 h-[1px] bg-[#8A4B32]/25" />
-                </div>
-
-                {/* Attendance Toggle */}
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setRsvpStatus("hadir")}
-                    className={`py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      rsvpStatus === "hadir"
-                        ? "bg-[#8A4B32] text-white shadow-md"
-                        : "bg-[#e5d8cb] text-[#5C4A40] hover:bg-[#d8c8b8]"
-                    }`}
-                  >
-                    <span>✔</span>
-                    <span>Hadir</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setRsvpStatus("tidak_hadir")}
-                    className={`py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
-                      rsvpStatus === "tidak_hadir"
-                        ? "bg-[#8A4B32] text-white shadow-md"
-                        : "bg-[#e5d8cb] text-[#5C4A40] hover:bg-[#d8c8b8]"
-                    }`}
-                  >
-                    <span>✖</span>
-                    <span>Tidak Hadir</span>
-                  </button>
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={isSubmittingRsvp}
-                  className="w-full py-2.5 rounded-full bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-semibold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer mt-2 disabled:opacity-70"
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-[#8A4B32] via-[#7D3F28] to-[#6E3622] hover:from-[#9C5539] hover:to-[#82422C] text-white font-sr-sans font-semibold text-xs sm:text-sm shadow-md transition-all active:scale-[0.98] cursor-pointer mt-2 disabled:opacity-70 flex items-center justify-center gap-2"
                 >
-                  {isSubmittingRsvp ? "Mengirim..." : "Kirim"}
+                  {isSubmittingRsvp ? (
+                    <>
+                      <span className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Mengirim Konfirmasi...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Kirim Konfirmasi &amp; Ucapan</span>
+                      <span className="text-sm">→</span>
+                    </>
+                  )}
                 </button>
 
+                {/* Success Banner */}
                 {rsvpSuccessMsg && (
-                  <p className="text-center font-sr-sans text-xs text-green-700 font-semibold pt-1">
-                    ✓ Terima kasih! Ucapan Anda berhasil terkirim.
-                  </p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3.5 rounded-2xl bg-[#EBF7EE] border border-[#85D49B]/60 text-[#1E6B35] font-sr-sans text-xs flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <span className="text-sm font-bold">✓</span>
+                    <span className="font-semibold">Terima kasih! RSVP dan doa restu Anda telah berhasil dikirim.</span>
+                  </motion.div>
                 )}
               </form>
 
               {/* Wishes List Container */}
-              <div className="pt-3 space-y-3 max-h-72 overflow-y-auto pr-1">
-                {wishesList.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="flex items-start gap-2.5"
-                  >
-                    {/* Circle Avatar with Initials */}
-                    <div className={`w-8 h-8 rounded-full ${item.color} text-white flex items-center justify-center text-[11px] font-bold shrink-0 shadow-sm`}>
-                      {item.initial}
-                    </div>
+              <div className="pt-4 border-t border-[#8A4B32]/15 space-y-3.5 text-left">
+                <div className="flex items-center justify-between px-1">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs">💬</span>
+                    <h4 className="font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">
+                      Doa &amp; Ucapan ({wishesList.length})
+                    </h4>
+                  </div>
+                  <span className="font-sr-sans text-[10px] text-[#8C7A70]">
+                    Scroll ke bawah ↓
+                  </span>
+                </div>
 
-                    {/* Speech Box */}
-                    <div className="flex-1 bg-white rounded-xl p-3 shadow-sm border border-[#8A4B32]/10 space-y-0.5">
-                      <h5 className="font-sr-sans font-bold text-xs text-[#8A4B32]">
-                        {item.name}
-                      </h5>
-                      <p className="font-sr-sans text-[11px] text-[#5C4A40] leading-relaxed">
+                <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
+                  {wishesList.map((item, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.4, delay: idx * 0.05 }}
+                      className="p-3.5 rounded-2xl bg-white border border-[#8A4B32]/15 shadow-sm space-y-2 hover:border-[#8A4B32]/30 transition-colors"
+                    >
+                      {/* Header: Avatar, Name & Attendance Badge */}
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`w-8 h-8 rounded-full ${item.color || "bg-[#8A4B32]"} text-white flex items-center justify-center text-[11px] font-bold shrink-0 shadow-sm`}>
+                            {item.initial}
+                          </div>
+                          <div>
+                            <h5 className="font-sr-sans font-bold text-xs text-[#3C2A21] leading-tight">
+                              {item.name}
+                            </h5>
+                            <p className="font-sr-sans text-[9px] text-[#8C7A70] leading-none mt-0.5">
+                              {item.created_at || "Baru saja"}
+                            </p>
+                          </div>
+                        </div>
+
+                        {/* Attendance Badge */}
+                        {item.attendance === "hadir" ? (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF7EE] text-[#1E6B35] border border-[#A3E4B5]/60 flex items-center gap-1 shrink-0">
+                            <span>✓</span>
+                            <span>Hadir{item.pax ? ` (${item.pax})` : ""}</span>
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#FAECE7] text-[#B03A2E] border border-[#F5C6CB] flex items-center gap-1 shrink-0">
+                            <span>✕</span>
+                            <span>Tidak Hadir</span>
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Message Content */}
+                      <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed pl-10 pr-1">
                         {item.message}
                       </p>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  ))}
+                </div>
               </div>
+
             </motion.div>
           </div>
         </section>
