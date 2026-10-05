@@ -1490,7 +1490,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {isOpened && (
         <>
           {/* Floating Rotating Music Disc */}
-          <div className="fixed bottom-20 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-end px-4 sm:px-6">
+          <div className="fixed bottom-6 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-end px-4 sm:px-6">
             <button
               type="button"
               onClick={toggleMusic}
@@ -1503,29 +1503,6 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </button>
           </div>
 
-          {/* Floating Bottom Navigation Bar (6 ikon cokelat matching referensi) */}
-          <div className="fixed bottom-4 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-center px-4">
-            <nav className="pointer-events-auto bg-[#8A4B32]/95 backdrop-blur-md rounded-2xl px-2.5 py-1.5 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-1.5">
-              {[
-                { id: "hero-section", icon: "🏠", label: "Home" },
-                { id: "couple-section", icon: "🤍", label: "Mempelai" },
-                { id: "event-section", icon: "📅", label: "Acara" },
-                { id: "gallery-section", icon: "📷", label: "Galeri" },
-                { id: "gift-section", icon: "🎁", label: "Kado" },
-                { id: "rsvp-section", icon: "💬", label: "Ucapan" },
-              ].map((item, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => scrollToSection(item.id)}
-                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm text-white/90 hover:text-white hover:bg-white/20 transition-all active:scale-95"
-                  title={item.label}
-                >
-                  {item.icon}
-                </button>
-              ))}
-            </nav>
-          </div>
         </>
       )}
 
