@@ -238,7 +238,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         {/* ===================================================================== */}
         <section 
           id="hero-section" 
-          className="relative min-h-[100dvh] w-full flex flex-col items-center justify-between text-center px-6 py-10 overflow-hidden select-none bg-[#f5ede2]"
+          className="relative min-h-[100dvh] w-full flex flex-col items-center justify-center text-center px-6 py-12 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
           <div 
@@ -285,39 +285,60 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
 
           {/* Widgets Container */}
-          <div className="relative z-20 w-full max-w-xs space-y-3 pt-2">
+          <div className="relative z-20 w-full max-w-[320px] sm:max-w-[340px] flex flex-col items-center pt-2 pb-2">
             
             {/* Widget 1: Heading Text */}
             <motion.p 
-              initial={{ opacity: 0, y: -20 }}
+              initial={{ opacity: 0, y: -16 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80"
+              className="font-sr-sans text-[11px] sm:text-xs font-semibold tracking-[0.35em] uppercase text-[#3C2A21]/80 mb-3 sm:mb-4"
             >
               THE WEDDING OF
             </motion.p>
 
-            {/* Widget 2: Arch Photo Dome with Rotated Floral Wings (Matching Gambar 3) */}
+            {/* Widget 2: Arch Photo Dome with Animated Swaying Floral Wings */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.88, y: 30 }}
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative mx-auto my-2 w-[235px] sm:w-[260px] aspect-square flex items-center justify-center select-none"
+              className="relative mx-auto mb-6 sm:mb-7 w-[230px] sm:w-[255px] aspect-square flex items-center justify-center select-none"
             >
-              {/* Floral Wing Left - SR-01 rotated 180 degrees mirrored */}
-              <img 
+              {/* Floral Wing Left - Swaying Animated */}
+              <motion.img 
                 src="/assets/template/arch-wing-left.png" 
                 alt="Floral Wing Left" 
-                className="absolute -left-[75px] sm:-left-[84px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none" 
+                className="absolute -left-[74px] sm:-left-[82px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none origin-bottom-right" 
+                animate={{
+                  rotate: [-1.5, 1.8, -1.5],
+                  y: [0, -3.5, 0],
+                  x: [0, -1.5, 0],
+                }}
+                transition={{
+                  duration: 5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                }}
               />
 
-              {/* Floral Wing Right - SR-01 rotated 180 degrees */}
-              <img 
+              {/* Floral Wing Right - Swaying Animated */}
+              <motion.img 
                 src="/assets/template/arch-wing-right.png" 
                 alt="Floral Wing Right" 
-                className="absolute -right-[75px] sm:-right-[84px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none" 
+                className="absolute -right-[74px] sm:-right-[82px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none origin-bottom-left" 
+                animate={{
+                  rotate: [1.8, -1.5, 1.8],
+                  y: [0, -3.5, 0],
+                  x: [0, 1.5, 0],
+                }}
+                transition={{
+                  duration: 5.5,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: 0.6,
+                }}
               />
 
               {/* Arch Photo Dome */}
@@ -336,17 +357,18 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.65, ease: "easeOut" }}
+              className="w-full text-center mb-5 sm:mb-6"
             >
-              <h2 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight font-medium drop-shadow-sm">
+              <h2 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-[1.25] font-medium drop-shadow-sm px-2">
                 {brideNickname} &amp; {groomNickname}
               </h2>
-              <p className="font-sr-sans text-xs sm:text-sm font-medium text-[#4A3B32] mt-1 tracking-wide">
+              <p className="font-sr-sans text-xs sm:text-sm font-medium text-[#4A3B32] mt-2 tracking-wide">
                 {formattedDate}
               </p>
             </motion.div>
 
             {/* Widget 4: 4 Countdown Boxes (Per-box staggered animation) */}
-            <div className="grid grid-cols-4 gap-2 pt-1 px-1 w-full max-w-[280px] mx-auto">
+            <div className="grid grid-cols-4 gap-2.5 sm:gap-3 w-full max-w-[285px] sm:max-w-[300px] mx-auto mb-5 sm:mb-6">
               {[
                 { label: "Hari", val: timeLeft.days },
                 { label: "Jam", val: timeLeft.hours },
@@ -359,7 +381,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   whileInView={{ opacity: 1, scale: 1, y: 0 }}
                   viewport={{ once: false, amount: 0.3 }}
                   transition={{ duration: 0.5, delay: idx * 0.08, ease: "easeOut" }}
-                  className="bg-[#8A4B32] text-white rounded-xl py-2 px-1 flex flex-col items-center justify-center shadow-md border border-[#A85A3C]"
+                  className="bg-[#8A4B32] text-white rounded-xl py-2.5 px-1.5 flex flex-col items-center justify-center shadow-md border border-[#A85A3C]/40"
                 >
                   <span className="font-sr-sans text-lg sm:text-xl font-bold leading-none">
                     {String(item.val).padStart(2, "0")}
@@ -377,22 +399,23 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="pt-1 flex flex-col items-center gap-2.5"
+              className="flex flex-col items-center gap-3 pt-0.5"
             >
               <a 
                 href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=The+Wedding+of+${encodeURIComponent(brideNickname)}+%26+${encodeURIComponent(groomNickname)}`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-medium text-xs px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
+                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-medium text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
               >
                 <span>📅</span>
                 <span>Simpan Tanggal</span>
               </a>
 
               {/* Bouncing Arrow Down */}
-              <span className="text-[#8A4B32] text-lg animate-bounce pt-0.5">↓</span>
+              <span className="text-[#8A4B32] text-lg animate-bounce pt-1">↓</span>
             </motion.div>
           </div>
+          
 
           <div className="h-2" />
         </section>
