@@ -34,7 +34,8 @@ const formatFallbackGuestName = (raw: string): string => {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const resolvedParams = await params;
   let guestName = "Tamu Undangan";
-  const slug = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined;
+  const lastParam = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[resolvedParams.name.length - 1] : undefined;
+  const slug = lastParam || (resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined);
 
   const headersList = await headers();
   const host = headersList.get("host") || undefined;
@@ -43,8 +44,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   if (dbData.guest) {
     guestName = dbData.guest.name;
-  } else if (resolvedParams?.name && resolvedParams.name.length > 0) {
-    guestName = formatFallbackGuestName(resolvedParams.name.join(" "));
+  } else if (lastParam) {
+    guestName = formatFallbackGuestName(lastParam);
   }
 
   const brideName = dbData.project?.bride_nickname || "Nathalie";
@@ -85,8 +86,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function Home({ params }: Props) {
   const resolvedParams = await params;
-  let guestName = "Syipa";
-  const slug = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined;
+  let guestName = "Tamu Undangan";
+  const lastParam = resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[resolvedParams.name.length - 1] : undefined;
+  const slug = lastParam || (resolvedParams?.name && resolvedParams.name.length > 0 ? resolvedParams.name[0] : undefined);
 
   const headersList = await headers();
   const host = headersList.get("host") || undefined;
@@ -116,8 +118,8 @@ export default async function Home({ params }: Props) {
 
   if (dbData.guest) {
     guestName = dbData.guest.name;
-  } else if (resolvedParams?.name && resolvedParams.name.length > 0) {
-    guestName = formatFallbackGuestName(resolvedParams.name.join(" "));
+  } else if (lastParam) {
+    guestName = formatFallbackGuestName(lastParam);
   }
 
   const brideNickname = dbData.project?.bride_nickname || "Nathalie";
