@@ -228,12 +228,12 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
           />
 
-          {/* User prewedding couple photo with exact alpha mask blend */}
+          {/* User prewedding couple photo with exact alpha mask blend (faded lower down so bride's face is clear) */}
           <div 
-            className="absolute top-0 inset-x-0 h-[66%] pointer-events-none z-0 overflow-hidden"
+            className="absolute top-0 inset-x-0 h-[70%] pointer-events-none z-0 overflow-hidden"
             style={{
-              maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)",
-              WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)"
+              maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 56%, rgba(0,0,0,0.92) 66%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0) 94%)",
+              WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 56%, rgba(0,0,0,0.92) 66%, rgba(0,0,0,0.4) 80%, rgba(0,0,0,0) 94%)"
             }}
           >
             <img 
@@ -700,18 +700,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           id="event-section"
           className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#8A4B32]"
         >
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+            <div className="animate-sr-pulse-alt origin-bottom-left">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+            </div>
           </div>
           <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse origin-bottom-right">
+              <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto space-y-7">
@@ -836,18 +844,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
           />
 
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            <div className="animate-sr-pulse-alt origin-bottom-left">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            </div>
           </div>
           <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-bottom-right">
+              <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto">
@@ -955,18 +971,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
           />
 
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            <div className="animate-sr-pulse-alt origin-bottom-left">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            </div>
           </div>
           <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-bottom-right">
+              <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto">
@@ -1075,18 +1099,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           id="gift-section"
           className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#8A4B32] text-white"
         >
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+            <div className="animate-sr-pulse-alt origin-bottom-left">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+            </div>
           </div>
           <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            <div className="animate-sr-pulse origin-bottom-right">
+              <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto text-center space-y-6">
@@ -1179,18 +1211,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
           />
 
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            <div className="animate-sr-pulse-alt origin-bottom-left">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+            </div>
           </div>
           <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-bottom-right">
+              <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto space-y-6">
@@ -1338,12 +1378,16 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
           />
 
-          {/* Floral Corners */}
+          {/* Animated Floral Corners */}
           <div className="absolute top-0 left-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            <div className="animate-sr-pulse origin-top-left">
+              <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+            </div>
           </div>
           <div className="absolute top-0 right-0 pointer-events-none z-10">
-            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            <div className="animate-sr-pulse-delay origin-top-right">
+              <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+            </div>
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-12">
@@ -1411,18 +1455,24 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               {/* Brand Logo */}
               <div className="inline-flex items-center gap-2 justify-center">
                 <div className="w-6 h-6 rounded-lg bg-[#2DD4BF] flex items-center justify-center text-white font-bold text-xs shadow-sm">
-                  i
+                  S
                 </div>
-                <span className="font-sans font-semibold text-sm tracking-wide text-white">invisimple.id</span>
+                <span className="font-sans font-semibold text-sm tracking-wide text-white">SeraStory</span>
               </div>
 
               {/* Social Links */}
               <div className="flex items-center justify-center gap-3 text-[11px] text-white/90 font-sr-sans pt-1">
-                <span className="flex items-center gap-1">📸 invisimple.id</span>
+                <a href="https://instagram.com/serastory.id" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
+                  📸 serastory.id
+                </a>
                 <span>•</span>
-                <span className="flex items-center gap-1">💬 0851 50000 715</span>
+                <a href="https://wa.me/6285189970998" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
+                  💬 085189970998
+                </a>
                 <span>•</span>
-                <span className="flex items-center gap-1">🎵 invisimple.id</span>
+                <a href="https://tiktok.com/@serastory.id" target="_blank" rel="noreferrer" className="flex items-center gap-1 hover:text-white transition-colors">
+                  🎵 serastory.id
+                </a>
               </div>
 
               <p className="font-sr-sans text-[10px] tracking-[0.25em] uppercase text-white/70 pt-2 font-medium">
