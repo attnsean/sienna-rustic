@@ -269,14 +269,49 @@ export async function resolveProjectData(slug?: string, host?: string): Promise<
           .eq('project_id', projectId)
           .order('sort_order', { ascending: true });
 
+        let loveStories = (loveStoryData || []).map(item => ({
+          id: item.id,
+          year: item.year,
+          title: item.title,
+          desc: item.description,
+          order: item.sort_order
+        }));
+
+        // Fallback to love_stories table if love_story_items table is empty
+        if (loveStories.length === 0) {
+          const { data: lsTable } = await supabase
+            .from('love_stories')
+            .select('items')
+            .eq('project_id', projectId)
+            .maybeSingle();
+
+          if (lsTable?.items && Array.isArray(lsTable.items)) {
+            loveStories = lsTable.items.map((item, idx) => ({
+              id: item.id || String(idx + 1),
+              year: item.year || item.date || '',
+              title: item.title || '',
+              desc: item.description || item.desc || '',
+              order: item.order || idx + 1
+            }));
+          }
+        }
+
         if (result.project) {
-          result.project.love_story_items = (loveStoryData || []).map(item => ({
-            id: item.id,
-            year: item.year,
-            title: item.title,
-            desc: item.description,
-            order: item.sort_order
-          }));
+          result.project.love_story_items = loveStories;
+
+          // Parse payment_accounts if stored as string
+          if (typeof result.project.payment_accounts === 'string') {
+            try {
+              result.project.payment_accounts = JSON.parse(result.project.payment_accounts);
+            } catch {}
+          }
+
+          // Parse gallery_photos if stored as string
+          if (typeof result.project.gallery_photos === 'string') {
+            try {
+              result.project.gallery_photos = JSON.parse(result.project.gallery_photos);
+            } catch {}
+          }
         }
 
         // 6. Fetch RSVP attendance stats (attending sum)

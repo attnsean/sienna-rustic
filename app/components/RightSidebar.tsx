@@ -46,11 +46,154 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const mainEvent = events && events.length > 0 ? events[0] : null;
   const weddingDateRaw = mainEvent?.event_date || project?.wedding_date || "2026-05-23";
 
+  // Deceased Parent Flags
+  const brideFatherDeceased = (project as any)?.bride_father_deceased || false;
+  const brideMotherDeceased = (project as any)?.bride_mother_deceased || false;
+  const groomFatherDeceased = (project as any)?.groom_father_deceased || false;
+  const groomMotherDeceased = (project as any)?.groom_mother_deceased || false;
+
+  // Dynamic Quotes / Ayat
+  const quoteText = (project as any)?.quote_translation 
+    || (project as any)?.quote_intro_line1 
+    || "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.";
+  const quoteSource = (project as any)?.quote_source 
+    || ((project as any)?.religion === 'kristen' || (project as any)?.religion === 'katolik' 
+        ? "1 Korintus 13:4-7" 
+        : "Q.S Ar-Rum : 21");
+
+  // Dynamic Love Story
+  const defaultLoveStories = [
+    {
+      id: "1",
+      title: "Awal Pertemuan",
+      date: "05 Maret 2024",
+      desc: "Tanpa sengaja semesta mempertemukan kami lewat dunia maya. Dari obrolan ringan di sosial media, kami pertama bertemu pada tanggal 05 Maret 2024. Tidak ada yang menyangka bahwa dari pertemuan sederhana itu tumbuh rasa hangat hingga hati kami sepakat untuk saling menjaga dan melengkapi."
+    },
+    {
+      id: "2",
+      title: "Ikatan Suci (Lamaran)",
+      date: "29 Maret 2026",
+      desc: "Kehendak-Nya menuntun kami pada sebuah ikatan suci yang diridhoi-Nya. Di titik ini, kami memilih untuk berhenti mencari. Momen lamaran pada 29 Maret 2026 menjadi bukti nyata dari kesungguhan hati untuk siap melangkah bersama seumur hidup."
+    },
+    {
+      id: "3",
+      title: "Menuju Pelaminan",
+      date: "23 Mei 2026",
+      desc: "Kini, langkah kami semakin dekat menuju babak baru yang penuh berkah. Dengan doa restu keluarga dan orang-orang terkasih, kami bersiap mengucap janji suci di hadapan Sang Pencipta untuk saling mencintai hingga akhir hayat."
+    }
+  ];
+
+  const loveStories = Array.isArray((project as any)?.love_story_items) && (project as any).love_story_items.length > 0
+    ? (project as any).love_story_items.map((item: any, idx: number) => ({
+        id: item.id || String(idx + 1),
+        title: item.title || ('Cerita #' + (idx + 1)),
+        date: item.year || item.date || "",
+        desc: item.desc || item.description || ""
+      }))
+    : defaultLoveStories;
+
+  // Dynamic Payment Accounts
+  const defaultPaymentAccounts = [
+    {
+      type: "bank",
+      provider: "BCA",
+      account_number: "3480 9948 75",
+      account_name: brideNickname || "Sopiah"
+    },
+    {
+      type: "bank",
+      provider: "Mandiri",
+      account_number: "131 00 1839281 9",
+      account_name: groomNickname || "Marvel"
+    }
+  ];
+
+  const paymentAccounts = Array.isArray((project as any)?.payment_accounts) && (project as any).payment_accounts.length > 0
+    ? (project as any).payment_accounts
+    : defaultPaymentAccounts;
+
+  const physicalGiftAddress = (project as any)?.wishlist_note 
+    || (project as any)?.venue_address 
+    || "Villa Nusa Permai, Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur";
+
+  // Dynamic Events List
+  const defaultEvents = [
+    {
+      id: "1",
+      event_type: "akad",
+      custom_label: "Akad Nikah",
+      badge: "Acara Sakral",
+      event_date: weddingDateRaw,
+      time_display: "Pukul 08:00 WIB - Selesai",
+      venue_name: "Villa Nusa Permai",
+      venue_address: "Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur",
+      venue_maps_url: "https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur"
+    },
+    {
+      id: "2",
+      event_type: "resepsi",
+      custom_label: "Resepsi",
+      badge: "Perayaan & Ramah Tamah",
+      event_date: weddingDateRaw,
+      time_display: "Pukul 11:00 WIB - Selesai",
+      venue_name: "Villa Nusa Permai",
+      venue_address: "Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur",
+      venue_maps_url: "https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur"
+    }
+  ];
+
+  const eventsList = events && events.length > 0
+    ? events.map((ev: any, idx: number) => {
+        const isSakral = ev.event_type === "akad" || ev.event_type === "pemberkatan";
+        const label = ev.custom_label || (
+          ev.event_type === "akad" ? "Akad Nikah" :
+          ev.event_type === "pemberkatan" ? "Pemberkatan Nikah" :
+          ev.event_type === "resepsi" ? "Resepsi" :
+          ev.event_type === "unduh_mantu" ? "Unduh Mantu" :
+          "Acara Spesial"
+        );
+        const timeStr = ev.event_time 
+          ? ('Pukul ' + ev.event_time.slice(0, 5) + (ev.end_time ? ' - ' + ev.end_time.slice(0, 5) : ' - Selesai') + ' WIB')
+          : (isSakral ? "Pukul 08:00 WIB - Selesai" : "Pukul 11:00 WIB - Selesai");
+        
+        return {
+          id: ev.id || String(idx + 1),
+          event_type: ev.event_type,
+          custom_label: label,
+          badge: isSakral ? "Acara Sakral" : "Perayaan & Ramah Tamah",
+          event_date: ev.event_date || weddingDateRaw,
+          time_display: timeStr,
+          venue_name: ev.venue_name || (project as any)?.venue_name || "Nama Lokasi",
+          venue_address: ev.venue_address || (project as any)?.venue_address || "Alamat Lokasi",
+          venue_maps_url: ev.venue_maps_url || (project as any)?.venue_maps_url || ('https://maps.google.com/?q=' + encodeURIComponent(ev.venue_name || ''))
+        };
+      })
+    : defaultEvents;
+
+  const parseEventDateParts = (dStr: string) => {
+    try {
+      const d = new Date(dStr);
+      if (isNaN(d.getTime())) return { dayName: "Sabtu", dayNumber: "23", monthName: "Mei", year: "2026", subtextLeft: "Hari Bahagia", subtextRight: "Bulan Baik" };
+      const days = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+      const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+      return {
+        dayName: days[d.getDay()],
+        dayNumber: String(d.getDate()),
+        monthName: months[d.getMonth()],
+        year: String(d.getFullYear()),
+        subtextLeft: "Hari Bahagia",
+        subtextRight: "Bulan Baik"
+      };
+    } catch {
+      return { dayName: "Sabtu", dayNumber: "23", monthName: "Mei", year: "2026", subtextLeft: "Hari Bahagia", subtextRight: "Bulan Baik" };
+    }
+  };
+
   // Countdown timer calculations
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
 
   // Gallery State & Debounced Auto-Slide
-  const galleryImages = [
+  const defaultGalleryImages = [
     "/assets/template/01-09.png",
     "/assets/template/01-10.png",
     "/assets/template/01-11.png",
@@ -59,6 +202,14 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     "/assets/template/01-14.png",
     "/assets/template/01-15.png",
   ];
+
+  const dbGallery = Array.isArray((project as any)?.gallery_photos) && (project as any).gallery_photos.length > 0
+    ? (project as any).gallery_photos.map((p: any) => typeof p === 'string' ? p : p?.url || p?.public_url).filter(Boolean)
+    : (Array.isArray((project as any)?.photo_urls) && (project as any).photo_urls.length > 0 
+        ? (project as any).photo_urls 
+        : []);
+
+  const galleryImages: string[] = dbGallery.length > 0 ? dbGallery : defaultGalleryImages;
   const [activePhotoIdx, setActivePhotoIdx] = useState(0);
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [isUserHovering, setIsUserHovering] = useState(false);
@@ -628,7 +779,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="font-sr-sans text-xs sm:text-sm leading-relaxed text-white/95 italic font-light"
             >
-              &quot;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.&quot;
+              &quot;{quoteText}&quot;
             </motion.p>
 
             {/* Widget 2: Surah Title */}
@@ -639,7 +790,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
               className="font-sr-sans text-base sm:text-lg font-bold tracking-wide text-white"
             >
-              Q.S Ar-Rum : 21
+              {quoteSource}
             </motion.h3>
           </div>
         </section>
@@ -734,7 +885,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Wanita</p>
-                <p className="text-[11px] leading-tight">Putri dari Bapak {brideFather} &amp; Ibu {brideMother}</p>
+                <p className="text-[11px] leading-tight">Putri dari Bapak {brideFather}{brideFatherDeceased ? " (Alm)" : ""} &amp; Ibu {brideMother}{brideMotherDeceased ? " (Almh)" : ""}</p>
               </div>
 
               {brideIg && (
@@ -783,7 +934,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Pria</p>
-                <p className="text-[11px] leading-tight">Putra dari Bapak {groomFather} &amp; Ibu {groomMother}</p>
+                <p className="text-[11px] leading-tight">Putra dari Bapak {groomFather}{groomFatherDeceased ? " (Alm)" : ""} &amp; Ibu {groomMother}{groomMotherDeceased ? " (Almh)" : ""}</p>
               </div>
 
               {groomIg && (
@@ -853,75 +1004,83 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </div>
             </motion.div>
 
-            {/* Card 1: Akad Nikah */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.65, ease: "easeOut" }}
-              className="relative rounded-[28px] p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-[#D4A373]/30 bg-[#FFFDF9]/95 text-[#3C2A21] space-y-4"
-              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
-            >
-              <div className="inline-block px-3.5 py-1 rounded-full bg-[#8A4B32]/10 text-[#8A4B32] font-sr-sans text-[10px] font-bold tracking-[0.2em] uppercase">
-                Acara Sakral
-              </div>
-
-              <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
-                Akad Nikah
-              </h4>
-
-              {/* Date Block with Balanced Hierarchy */}
-              <div className="flex items-center justify-center gap-3 py-2 border-y border-[#8A4B32]/15 max-w-[270px] mx-auto">
-                <div className="text-right flex-1">
-                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Sabtu</span>
-                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Pagi Hari</span>
-                </div>
-                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
-                <div className="px-2 text-center">
-                  <span className="block font-serif text-3xl sm:text-4xl font-extrabold text-[#8A4B32] leading-none">23</span>
-                  <span className="block font-sr-sans text-[10px] font-bold tracking-widest text-[#8A4B32] uppercase mt-0.5">2026</span>
-                </div>
-                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
-                <div className="text-left flex-1">
-                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Mei</span>
-                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Bulan Baik</span>
-                </div>
-              </div>
-
-              {/* Time Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8A4B32] text-white font-sr-sans text-xs font-semibold shadow-sm">
-                <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                <span>Pukul 08:00 WIB - Selesai</span>
-              </div>
-
-              {/* Location Info */}
-              <div className="pt-1 space-y-1">
-                <h5 className="font-sr-sans font-bold text-sm text-[#3C2A21]">
-                  Villa Nusa Permai
-                </h5>
-                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed max-w-[280px] mx-auto">
-                  Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur
-                </p>
-              </div>
-
-              {/* Google Maps Button */}
-              <div className="pt-1">
-                <a 
-                  href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
+            {/* Dynamic Event Cards */}
+            {eventsList.map((ev: any, idx: number) => {
+              const dateParts = parseEventDateParts(ev.event_date);
+              return (
+                <motion.div 
+                  key={ev.id || idx}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.25 }}
+                  transition={{ duration: 0.65, delay: idx * 0.1, ease: "easeOut" }}
+                  className="relative rounded-[28px] p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-[#D4A373]/30 bg-[#FFFDF9]/95 text-[#3C2A21] space-y-4"
+                  style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
                 >
-                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                  </svg>
-                  <span>Buka Google Maps</span>
-                </a>
-              </div>
-            </motion.div>
+                  <div className="inline-block px-3.5 py-1 rounded-full bg-[#8A4B32]/10 text-[#8A4B32] font-sr-sans text-[10px] font-bold tracking-[0.2em] uppercase">
+                    {ev.badge}
+                  </div>
+
+                  <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
+                    {ev.custom_label}
+                  </h4>
+
+                  {/* Date Block with Balanced Hierarchy */}
+                  <div className="flex items-center justify-center gap-3 py-2 border-y border-[#8A4B32]/15 max-w-[270px] mx-auto">
+                    <div className="text-right flex-1">
+                      <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">{dateParts.dayName}</span>
+                      <span className="block font-sr-sans text-[10px] text-[#8C7A70]">{dateParts.subtextLeft}</span>
+                    </div>
+                    <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                    <div className="px-2 text-center">
+                      <span className="block font-serif text-3xl sm:text-4xl font-extrabold text-[#8A4B32] leading-none">{dateParts.dayNumber}</span>
+                      <span className="block font-sr-sans text-[10px] font-bold tracking-widest text-[#8A4B32] uppercase mt-0.5">{dateParts.year}</span>
+                    </div>
+                    <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                    <div className="text-left flex-1">
+                      <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">{dateParts.monthName}</span>
+                      <span className="block font-sr-sans text-[10px] text-[#8C7A70]">{dateParts.subtextRight}</span>
+                    </div>
+                  </div>
+
+                  {/* Time Pill Badge */}
+                  <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8A4B32] text-white font-sr-sans text-xs font-semibold shadow-sm">
+                    <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <polyline points="12 6 12 12 16 14" />
+                    </svg>
+                    <span>{ev.time_display}</span>
+                  </div>
+
+                  {/* Location Info */}
+                  <div className="pt-1 space-y-1">
+                    <h5 className="font-sr-sans font-bold text-sm text-[#3C2A21]">
+                      {ev.venue_name}
+                    </h5>
+                    <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed max-w-[280px] mx-auto">
+                      {ev.venue_address}
+                    </p>
+                  </div>
+
+                  {/* Google Maps Button */}
+                  {ev.venue_maps_url && (
+                    <div className="pt-1">
+                      <a 
+                        href={ev.venue_maps_url} 
+                        target="_blank" 
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
+                      >
+                        <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                        </svg>
+                        <span>Buka Google Maps</span>
+                      </a>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
 
             {/* Card 2: Resepsi */}
             <motion.div 
@@ -1058,92 +1217,39 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               {/* Vertical Spine */}
               <div className="absolute left-[13px] sm:left-[15px] top-4 bottom-5 w-[2px] bg-gradient-to-b from-[#8A4B32]/40 via-[#8A4B32]/25 to-transparent" />
 
-              {/* Story 1: Awal Kisah */}
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.6, ease: "easeOut" }}
-                className="relative"
-              >
-                {/* Node */}
-                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
-                  ♥
-                </div>
-
-                {/* Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
-                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
-                      Awal Pertemuan
-                    </h4>
-                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
-                      05 Maret 2024
-                    </span>
+              {/* Dynamic Love Stories */}
+              {loveStories.map((story: any, idx: number) => (
+                <motion.div 
+                  key={story.id || idx}
+                  initial={{ opacity: 0, x: 20 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: false, amount: 0.25 }}
+                  transition={{ duration: 0.6, delay: idx * 0.1, ease: "easeOut" }}
+                  className="relative"
+                >
+                  {/* Node */}
+                  <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
+                    {idx === 0 ? "♥" : idx === 1 ? "💍" : "✦"}
                   </div>
-                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
-                    Tanpa sengaja semesta mempertemukan kami lewat dunia maya. Dari obrolan ringan di sosial media, kami pertama bertemu pada tanggal 05 Maret 2024. Tidak ada yang menyangka bahwa dari pertemuan sederhana itu tumbuh rasa hangat hingga hati kami sepakat untuk saling menjaga dan melengkapi.
-                  </p>
-                </div>
-              </motion.div>
 
-              {/* Story 2: Lamaran */}
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
-                className="relative"
-              >
-                {/* Node */}
-                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
-                  💍
-                </div>
-
-                {/* Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
-                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
-                      Ikatan Suci (Lamaran)
-                    </h4>
-                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
-                      29 Maret 2026
-                    </span>
+                  {/* Card */}
+                  <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
+                    <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
+                      <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
+                        {story.title}
+                      </h4>
+                      {story.date && (
+                        <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
+                          {story.date}
+                        </span>
+                      )}
+                    </div>
+                    <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
+                      {story.desc}
+                    </p>
                   </div>
-                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
-                    Kehendak-Nya menuntun kami pada sebuah ikatan suci yang diridhoi-Nya. Di titik ini, kami memilih untuk berhenti mencari. Momen lamaran pada 29 Maret 2026 menjadi bukti nyata dari kesungguhan hati untuk siap melangkah bersama seumur hidup.
-                  </p>
-                </div>
-              </motion.div>
-
-              {/* Story 3: Menuju Pelaminan */}
-              <motion.div 
-                initial={{ opacity: 0, x: 20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
-                className="relative"
-              >
-                {/* Node */}
-                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
-                  ✨
-                </div>
-
-                {/* Card */}
-                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
-                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
-                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
-                      Awal Selamanya
-                    </h4>
-                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
-                      23 Mei 2026
-                    </span>
-                  </div>
-                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
-                    Dan tibalah hari yang paling kami nantikan. Bukan sekadar merayakan cinta kami berdua, tapi menyatukan dua keluarga besar dalam ikatan suci pernikahan. Hari di mana perjalanan baru kami resmi dimulai.
-                  </p>
-                </div>
-              </motion.div>
+                </motion.div>
+              ))}
 
             </div>
           </div>
@@ -1235,7 +1341,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
                 {/* Auto-Slide Progress Dots at Bottom */}
                 <div className="absolute bottom-3 inset-x-0 flex items-center justify-center gap-1.5 z-10 pointer-events-none">
-                  {galleryImages.map((_, i) => (
+                  {galleryImages.map((_: string, i: number) => (
                     <span 
                       key={i}
                       className={`h-1.5 rounded-full transition-all duration-300 ${
@@ -1377,122 +1483,81 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </div>
             </motion.div>
 
-            {/* List of 2 Bank Cards */}
+            {/* Dynamic Bank Cards */}
             <div className="space-y-5">
-              
-              {/* Card 1: BCA (Mempelai Wanita - Sopiah) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.94, y: 25 }}
-                whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.65, ease: "easeOut" }}
-                className="relative rounded-[26px] p-6 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#FFFDF9]/95 text-[#3C2A21] max-w-xs mx-auto"
-                style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
-              >
-                {/* Card Top: BCA Logo & EMV Chip */}
-                <div className="flex items-center justify-between mb-5">
-                  <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-[#00529C] flex items-center justify-center text-[10px] text-white font-extrabold">
-                      B
-                    </div>
-                    <span className="font-sans font-extrabold text-sm tracking-wider text-[#00529C]">BCA</span>
-                  </div>
+              {paymentAccounts.map((account: any, idx: number) => {
+                const providerUpper = (account.provider || "BANK").toUpperCase();
+                const isBCA = providerUpper.includes("BCA");
+                const isMandiri = providerUpper.includes("MANDIRI");
+                const isBNI = providerUpper.includes("BNI");
+                const isBRI = providerUpper.includes("BRI");
+                const isBSI = providerUpper.includes("BSI");
 
-                  {/* EMV Gold Chip Icon */}
-                  <div className="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-amber-600/40 shadow-inner flex flex-col justify-around p-1">
-                    <div className="w-full h-[1px] bg-amber-700/35" />
-                    <div className="w-full h-[1px] bg-amber-700/35" />
-                  </div>
-                </div>
-
-                {/* Account Number */}
-                <div className="space-y-1 mb-4">
-                  <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
-                    Nomor Rekening
-                  </span>
-                  <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
-                    3480 9948 75
-                  </p>
-                </div>
-
-                {/* Account Holder & Copy Button */}
-                <div className="flex items-end justify-between pt-1 border-t border-[#8A4B32]/10">
-                  <div>
-                    <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
-                      Atas Nama
-                    </span>
-                    <p className="font-sr-sans text-sm font-bold text-[#3C2A21]">
-                      Sopiah
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => copyAccountNumber("3480994875", 1)}
-                    className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-4 py-2 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                return (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.94, y: 25 }}
+                    whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                    viewport={{ once: false, amount: 0.25 }}
+                    transition={{ duration: 0.65, delay: idx * 0.1, ease: "easeOut" }}
+                    className="relative rounded-[26px] p-6 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#FFFDF9]/95 text-[#3C2A21] max-w-xs mx-auto"
+                    style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
                   >
-                    <span>{copiedBankIndex === 1 ? "✓" : "📋"}</span>
-                    <span>{copiedBankIndex === 1 ? "Tersalin!" : "Salin"}</span>
-                  </button>
-                </div>
-              </motion.div>
+                    {/* Card Top: Logo & EMV Chip */}
+                    <div className="flex items-center justify-between mb-5">
+                      <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1.5">
+                        <div className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] text-white font-extrabold ${
+                          isBCA ? "bg-[#00529C]" : isMandiri ? "bg-[#003d79]" : isBNI ? "bg-[#F15A24]" : isBRI ? "bg-[#00529C]" : "bg-[#8A4B32]"
+                        }`}>
+                          {providerUpper.charAt(0)}
+                        </div>
+                        <span className={`font-sans font-extrabold text-sm tracking-wider ${
+                          isBCA ? "text-[#00529C]" : isMandiri ? "text-[#003d79]" : isBNI ? "text-[#F15A24]" : "text-[#8A4B32]"
+                        }`}>
+                          {providerUpper}
+                        </span>
+                      </div>
 
-              {/* Card 2: Bank Mandiri (Mempelai Pria - Marvel) */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.94, y: 25 }}
-                whileInView={{ opacity: 1, scale: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.65, delay: 0.12, ease: "easeOut" }}
-                className="relative rounded-[26px] p-6 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#FFFDF9]/95 text-[#3C2A21] max-w-xs mx-auto"
-                style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
-              >
-                {/* Card Top: Mandiri Logo & EMV Chip */}
-                <div className="flex items-center justify-between mb-5">
-                  <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1.5">
-                    <div className="w-5 h-5 rounded-full bg-[#003d79] flex items-center justify-center text-[10px] text-[#ffb81c] font-black">
-                      M
+                      {/* EMV Gold Chip Icon */}
+                      <div className="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-amber-600/40 shadow-inner flex flex-col justify-around p-1">
+                        <div className="w-full h-[1px] bg-amber-700/35" />
+                        <div className="w-full h-[1px] bg-amber-700/35" />
+                      </div>
                     </div>
-                    <span className="font-sans font-extrabold text-sm tracking-wider text-[#003d79]">MANDIRI</span>
-                  </div>
 
-                  {/* EMV Gold Chip Icon */}
-                  <div className="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-amber-600/40 shadow-inner flex flex-col justify-around p-1">
-                    <div className="w-full h-[1px] bg-amber-700/35" />
-                    <div className="w-full h-[1px] bg-amber-700/35" />
-                  </div>
-                </div>
+                    {/* Account Number */}
+                    <div className="space-y-1 mb-4">
+                      <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                        Nomor Rekening
+                      </span>
+                      <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
+                        {account.account_number}
+                      </p>
+                    </div>
 
-                {/* Account Number */}
-                <div className="space-y-1 mb-4">
-                  <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
-                    Nomor Rekening
-                  </span>
-                  <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
-                    1320 0284 9182 3
-                  </p>
-                </div>
+                    {/* Account Holder & Copy Button */}
+                    <div className="flex items-end justify-between pt-1 border-t border-[#8A4B32]/10">
+                      <div>
+                        <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                          Atas Nama
+                        </span>
+                        <p className="font-sr-sans text-sm font-bold text-[#3C2A21]">
+                          {account.account_name}
+                        </p>
+                      </div>
 
-                {/* Account Holder & Copy Button */}
-                <div className="flex items-end justify-between pt-1 border-t border-[#8A4B32]/10">
-                  <div>
-                    <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
-                      Atas Nama
-                    </span>
-                    <p className="font-sr-sans text-sm font-bold text-[#3C2A21]">
-                      Marvel
-                    </p>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => copyAccountNumber("1320028491823", 2)}
-                    className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-4 py-2 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
-                  >
-                    <span>{copiedBankIndex === 2 ? "✓" : "📋"}</span>
-                    <span>{copiedBankIndex === 2 ? "Tersalin!" : "Salin"}</span>
-                  </button>
-                </div>
-              </motion.div>
+                      <button
+                        type="button"
+                        onClick={() => copyAccountNumber(account.account_number, idx + 1)}
+                        className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-4 py-2 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                      >
+                        <span>{copiedBankIndex === idx + 1 ? "✓" : "📋"}</span>
+                        <span>{copiedBankIndex === idx + 1 ? "Tersalin!" : "Salin"}</span>
+                      </button>
+                    </div>
+                  </motion.div>
+                );
+              })}
 
               {/* Physical Gift Option / Kirim Kado Fisik */}
               <motion.div
@@ -1507,11 +1572,11 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   <span>Kirim Kado Fisik</span>
                 </div>
                 <p className="text-[11px] text-white/90 leading-relaxed">
-                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                  {physicalGiftAddress}
                 </p>
                 <button
                   type="button"
-                  onClick={() => copyAddress("Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur")}
+                  onClick={() => copyAddress(physicalGiftAddress)}
                   className="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 text-white text-[11px] px-3.5 py-1.5 rounded-full border border-white/20 transition-all cursor-pointer"
                 >
                   <span>{copiedAddress ? "✓" : "📦"}</span>
