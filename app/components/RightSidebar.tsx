@@ -88,7 +88,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       audioRef.current.play().catch(() => {});
     }
 
-    // Clean up cover overlay after the slide-up animation finishes
+    // Clean up cover overlay after slide-up finishes
     setTimeout(() => {
       setIsCoverVisible(false);
     }, 950);
@@ -130,8 +130,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       />
 
       {/* ========================================================================= */}
-      {/* SECTION 1 - COVER MOBILE (Tidak disatukan, tidak bisa di-scroll sebelum buka) */}
-      {/* Saat tombol diklik, screen naik ke atas (y: -100%) */}
+      {/* SECTION 1 - COVER MOBILE (Layar terpisah, tidak bisa di-scroll sebelum buka) */}
+      {/* Pas klik buka, screen naik ke atas (y: -100%) */}
       {/* ========================================================================= */}
       {isCoverVisible && (
         <motion.section
@@ -228,12 +228,13 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       )}
 
       {/* ========================================================================= */}
-      {/* INVITATION CONTENT (Disambut dengan animasi Section 2 & aktif naik-turun) */}
+      {/* INVITATION CONTENT */}
+      {/* Animasi per widget muncul secara individu, bukan langsung full per section */}
       {/* ========================================================================= */}
       <div className="relative min-h-[100dvh] pb-24">
         
         {/* ===================================================================== */}
-        {/* SECTION 2 - HERO & COUNTDOWN (Sama persis Gambar 3: Bunga rotate 180) */}
+        {/* SECTION 2 - HERO & COUNTDOWN (Bunga di-rotate 180 persis Gambar 3) */}
         {/* ===================================================================== */}
         <section 
           id="hero-section" 
@@ -283,26 +284,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          {/* Content Container: Disambut animasi dan aktif setiap scroll naik-turun */}
+          {/* Widgets Container */}
           <div className="relative z-20 w-full max-w-xs space-y-3 pt-2">
             
-            {/* Heading Text */}
+            {/* Widget 1: Heading Text */}
             <motion.p 
-              initial={{ opacity: 0, y: -15 }}
+              initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
+              viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80"
             >
               THE WEDDING OF
             </motion.p>
 
-            {/* Arch Photo Dome with Floral Wings Behind it (Exact match Gambar 3) */}
+            {/* Widget 2: Arch Photo Dome with Rotated Floral Wings (Matching Gambar 3) */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.9, y: 25 }}
+              initial={{ opacity: 0, scale: 0.88, y: 30 }}
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="relative mx-auto my-2 w-[225px] sm:w-[250px] aspect-square flex items-center justify-center select-none"
             >
               {/* Floral Wing Left - SR-01 rotated 180 degrees */}
@@ -329,12 +330,12 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </div>
             </motion.div>
 
-            {/* Couple Title & Date */}
+            {/* Widget 3: Couple Title & Date */}
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 25 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
             >
               <h2 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight font-medium drop-shadow-sm">
                 {brideNickname} &amp; {groomNickname}
@@ -344,22 +345,20 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </p>
             </motion.div>
 
-            {/* 4 Countdown Boxes */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
-              className="grid grid-cols-4 gap-2 pt-1 px-1 w-full max-w-[280px] mx-auto"
-            >
+            {/* Widget 4: 4 Countdown Boxes (Per-box staggered animation) */}
+            <div className="grid grid-cols-4 gap-2 pt-1 px-1 w-full max-w-[280px] mx-auto">
               {[
                 { label: "Hari", val: timeLeft.days },
                 { label: "Jam", val: timeLeft.hours },
                 { label: "Menit", val: timeLeft.minutes },
                 { label: "Detik", val: timeLeft.seconds },
               ].map((item, idx) => (
-                <div 
+                <motion.div 
                   key={idx} 
+                  initial={{ opacity: 0, scale: 0.85, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.3 }}
+                  transition={{ duration: 0.5, delay: idx * 0.08, ease: "easeOut" }}
                   className="bg-[#8A4B32] text-white rounded-xl py-2 px-1 flex flex-col items-center justify-center shadow-md border border-[#A85A3C]"
                 >
                   <span className="font-sr-sans text-lg sm:text-xl font-bold leading-none">
@@ -368,16 +367,16 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   <span className="font-sr-sans text-[9px] uppercase tracking-wider text-white/80 mt-1">
                     {item.label}
                   </span>
-                </div>
+                </motion.div>
               ))}
-            </motion.div>
+            </div>
 
-            {/* Simpan Tanggal Button & Down Arrow */}
+            {/* Widget 5: Simpan Tanggal Button & Down Arrow */}
             <motion.div
-              initial={{ opacity: 0, y: 15 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
               className="pt-1 flex flex-col items-center gap-2.5"
             >
               <a 
@@ -399,36 +398,42 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         </section>
 
         {/* ===================================================================== */}
-        {/* SECTION 3 - AYAT SUCI (Q.S AR-RUM : 21) */}
+        {/* SECTION 3 - AYAT SUCI (Animasi per widget) */}
         {/* ===================================================================== */}
-        <motion.section 
+        <section 
           id="ayat-section"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.25 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative w-full px-6 py-12 overflow-hidden bg-[#8A4B32] text-white select-none shadow-md"
         >
           <div className="max-w-md mx-auto text-center space-y-6 px-2 py-4">
-            <p className="font-sr-sans text-xs sm:text-sm leading-relaxed text-white/95 italic font-light">
+            {/* Widget 1: Ayat Quote Text */}
+            <motion.p 
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="font-sr-sans text-xs sm:text-sm leading-relaxed text-white/95 italic font-light"
+            >
               &quot;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.&quot;
-            </p>
+            </motion.p>
 
-            <h3 className="font-sr-sans text-base sm:text-lg font-bold tracking-wide text-white">
+            {/* Widget 2: Surah Title */}
+            <motion.h3 
+              initial={{ opacity: 0, scale: 0.9, y: 15 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+              className="font-sr-sans text-base sm:text-lg font-bold tracking-wide text-white"
+            >
               Q.S Ar-Rum : 21
-            </h3>
+            </motion.h3>
           </div>
-        </motion.section>
+        </section>
 
         {/* ===================================================================== */}
-        {/* SECTION 4 - PROFIL MEMPELAI (BRIDE & GROOM) */}
+        {/* SECTION 4 - PROFIL MEMPELAI (Animasi per widget) */}
         {/* ===================================================================== */}
-        <motion.section 
+        <section 
           id="couple-section"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: false, amount: 0.15 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
           className="relative w-full px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
@@ -476,23 +481,35 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto text-center space-y-8 bg-white/70 backdrop-blur-sm rounded-3xl p-6 sm:p-8 border border-[#8A4B32]/15 shadow-xl">
-            {/* Greetings */}
-            <div className="space-y-2">
+            {/* Widget 1: Greetings Card */}
+            <motion.div 
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="space-y-2"
+            >
               <h4 className="font-sr-sans text-xs sm:text-sm font-bold text-[#3C2A21]">
                 Assalamu&apos;alaikum Warahmatullahi Wabarakatuh
               </h4>
               <p className="font-sr-sans text-[11px] leading-relaxed text-[#6E5D53]">
                 Maha Suci Allah yang telah menciptakan makhluk-Nya berpasang-pasangan. Ya Allah semoga ridho-Mu tercurah mengiringi pernikahan kami.
               </p>
-            </div>
+            </motion.div>
 
-            {/* Mempelai Wanita (Nathalie) */}
-            <div className="space-y-3 flex flex-col items-center">
+            {/* Widget 2: Mempelai Wanita (Nathalie) */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.92, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="space-y-3 flex flex-col items-center"
+            >
               <div className="w-40 aspect-[3/4] rounded-t-full overflow-hidden shadow-md border-2 border-[#8A4B32]/30">
                 <img 
                   src={bridePhoto} 
                   alt={brideFull} 
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top" 
                 />
               </div>
 
@@ -516,20 +533,32 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   <span>@{brideIg}</span>
                 </a>
               )}
-            </div>
+            </motion.div>
 
-            {/* Ampersand Divider */}
-            <div className="font-sr-script text-4xl text-[#8A4B32] my-2">
+            {/* Widget 3: Ampersand Divider */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="font-sr-script text-4xl text-[#8A4B32] my-2"
+            >
               &amp;
-            </div>
+            </motion.div>
 
-            {/* Mempelai Pria (Marvel) */}
-            <div className="space-y-3 flex flex-col items-center">
+            {/* Widget 4: Mempelai Pria (Marvel) */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.92, y: 30 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="space-y-3 flex flex-col items-center"
+            >
               <div className="w-40 aspect-[3/4] rounded-t-full overflow-hidden shadow-md border-2 border-[#8A4B32]/30">
                 <img 
                   src={groomPhoto} 
                   alt={groomFull} 
-                  className="w-full h-full object-cover object-top"
+                  className="w-full h-full object-cover object-top" 
                 />
               </div>
 
@@ -553,9 +582,9 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                   <span>@{groomIg}</span>
                 </a>
               )}
-            </div>
+            </motion.div>
           </div>
-        </motion.section>
+        </section>
 
       </div>
 
