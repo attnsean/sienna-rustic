@@ -19,6 +19,7 @@ interface Props {
 
 export default function RightSidebar({ guestName, guest, project, events, wishes: initialWishes }: Props) {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAnimating, setIsAnimating] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
   const [activeNav, setActiveNav] = useState("home");
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -78,17 +79,23 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const formattedDate = formatDateDisplay(weddingDateRaw);
 
   const handleOpenInvitation = () => {
-    setIsOpen(true);
+    if (isAnimating) return;
+    setIsAnimating(true);
     setIsPlayingMusic(true);
     if (audioRef.current) {
       audioRef.current.play().catch(() => {});
     }
+    // Wait for cover exit animation to complete, then show content
     setTimeout(() => {
-      const heroEl = document.getElementById("hero-section");
-      if (heroEl) {
-        heroEl.scrollIntoView({ behavior: "smooth" });
-      }
-    }, 100);
+      setIsOpen(true);
+      setIsAnimating(false);
+      setTimeout(() => {
+        const heroEl = document.getElementById("hero-section");
+        if (heroEl) {
+          heroEl.scrollIntoView({ behavior: "smooth" });
+        }
+      }, 200);
+    }, 900);
   };
 
   const toggleMusic = () => {
@@ -125,8 +132,15 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {/* SECTION 1 - COVER MOBILE / OPENING SCREEN */}
       {/* Photo background + parchment overlay like Gambar 1 */}
       {/* ========================================================================= */}
-      {!isOpen && (
-        <section className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]">
+      <AnimatePresence mode="wait">
+        {!isOpen && (
+          <motion.section
+            key="cover"
+            initial={{ opacity: 1, y: 0 }}
+            animate={isAnimating ? { opacity: 0, y: -80, scale: 1.02 } : { opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.75, ease: [0.4, 0, 0.2, 1] }}
+            className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]"
+          >
           
           {/* Base parchment background texture */}
           <div 
@@ -173,7 +187,11 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           <div className="relative z-10 flex-1 min-h-[44vh]" />
 
           {/* Center Info */}
-          <div className="relative z-20 w-full max-w-xs space-y-2.5 pt-1">
+          <motion.div 
+              className="relative z-20 w-full max-w-xs space-y-2.5 pt-1"
+              animate={isAnimating ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeInOut" }}
+            >
             <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
               THE WEDDING OF
             </p>
@@ -202,23 +220,32 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               <button
                 type="button"
                 onClick={handleOpenInvitation}
-                className="group relative inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] active:scale-95 text-white font-sr-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 cursor-pointer"
+                disabled={isAnimating}
+                className="group relative inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] active:scale-95 text-white font-sr-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <span>📖</span>
                 <span>Buka Undangan</span>
               </button>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="h-4" />
-        </section>
-      )}
+            <div className="h-4" />
+          </motion.section>
+        )}
+      </AnimatePresence>
 
       {/* ========================================================================= */}
       {/* INVITATION CONTENT (AFTER BUKA UNDANGAN) */}
       {/* ========================================================================= */}
-      {isOpen && (
-        <div className="relative pb-24">
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            key="invitation-content"
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
+            className="relative pb-24"
+          >
           
           {/* ===================================================================== */}
           {/* GAMBAR KE-3: SECTION 2 - HERO & COUNTDOWN */}
@@ -523,8 +550,9 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </nav>
           </div>
 
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
