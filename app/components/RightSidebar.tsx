@@ -304,20 +304,20 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               whileInView={{ opacity: 1, scale: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="relative mx-auto my-2 w-[225px] sm:w-[250px] aspect-square flex items-center justify-center select-none"
+              className="relative mx-auto my-2 w-[235px] sm:w-[260px] aspect-square flex items-center justify-center select-none"
             >
-              {/* Floral Wing Left - SR-01 rotated 180 degrees */}
+              {/* Floral Wing Left - SR-01 rotated 180 degrees mirrored */}
               <img 
                 src="/assets/template/arch-wing-left.png" 
                 alt="Floral Wing Left" 
-                className="absolute -left-[54px] sm:-left-[62px] bottom-0 w-[80px] sm:w-[92px] h-auto object-contain pointer-events-none z-10 select-none" 
+                className="absolute -left-[75px] sm:-left-[84px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none" 
               />
 
-              {/* Floral Wing Right - SR-01 rotated 180 degrees mirrored */}
+              {/* Floral Wing Right - SR-01 rotated 180 degrees */}
               <img 
                 src="/assets/template/arch-wing-right.png" 
                 alt="Floral Wing Right" 
-                className="absolute -right-[54px] sm:-right-[62px] bottom-0 w-[80px] sm:w-[92px] h-auto object-contain pointer-events-none z-10 select-none" 
+                className="absolute -right-[75px] sm:-right-[84px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none" 
               />
 
               {/* Arch Photo Dome */}
