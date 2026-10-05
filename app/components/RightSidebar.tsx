@@ -112,7 +112,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   };
 
   return (
-    <div className="w-full md:w-[50%] lg:w-[45%] xl:w-[42%] min-h-[100dvh] md:h-[100dvh] md:overflow-y-auto md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl flex-1 shrink-0">
+    <div className="w-full md:w-[38%] lg:w-[35%] xl:w-[32%] min-h-[100dvh] md:h-[100dvh] md:overflow-y-auto md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl shrink-0">
       {/* Background Audio Player */}
       <audio 
         ref={audioRef} 
@@ -126,33 +126,32 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       {/* Photo background + parchment overlay like Gambar 1 */}
       {/* ========================================================================= */}
       {!isOpen && (
-        <section className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-6 overflow-hidden select-none bg-[#3C2A21]">
+        <section className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]">
           
-          {/* Layer 1: User's prewedding photo as FULL background */}
-          <div className="absolute inset-0 pointer-events-none z-0">
+          {/* Base parchment background texture */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none"
+            style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
+          />
+
+          {/* User prewedding photo at top (100% full opacity, NO opacity overlay on photo, exactly like Gambar 2) */}
+          <div className="absolute top-0 inset-x-0 h-[56%] pointer-events-none z-0 overflow-hidden">
             <img 
               src={coverPhoto} 
               alt={`${brideNickname} & ${groomNickname}`} 
-              className="w-full h-full object-cover object-center"
+              className="w-full h-full object-cover object-top"
             />
+            {/* Smooth bottom gradient blend into parchment */}
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#f5ede2] via-[#f5ede2]/80 to-transparent" />
           </div>
 
-          {/* Layer 2: Parchment texture overlay with opacity (warm rustic feel) */}
-          <div 
-            className="absolute inset-0 pointer-events-none z-[1] opacity-55"
-            style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
-          />
-
-          {/* Layer 3: Gradient from top (transparent to show photo) to bottom (darker for text readability) */}
-          <div className="absolute inset-0 pointer-events-none z-[2] bg-gradient-to-b from-transparent via-[#f5ede2]/30 to-[#f5ede2]/80" />
-
-          {/* Animated Floral Corners - bottom corners */}
+          {/* Animated Floral Corners at Bottom - Large and prominent like Gambar 2 */}
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
             <div className="animate-sr-pulse-alt origin-bottom-left">
               <img 
                 src="/assets/template/SR-01.png" 
                 alt="Floral decoration" 
-                className="w-20 sm:w-28 h-auto object-contain select-none rotate-180" 
+                className="w-32 sm:w-36 md:w-40 h-auto object-contain select-none rotate-180" 
               />
             </div>
           </div>
@@ -161,16 +160,16 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               <img 
                 src="/assets/template/SR-03.png" 
                 alt="Floral decoration" 
-                className="w-24 sm:w-32 h-auto object-contain select-none" 
+                className="w-36 sm:w-40 md:w-44 h-auto object-contain select-none" 
               />
             </div>
           </div>
 
-          {/* Spacer to push content down (photo shows at top) */}
-          <div className="relative z-20 flex-1 min-h-[35vh]" />
+          {/* Spacer to push content down onto the parchment */}
+          <div className="relative z-10 flex-1 min-h-[44vh]" />
 
           {/* Center Info */}
-          <div className="relative z-20 w-full max-w-xs space-y-3 pt-2">
+          <div className="relative z-20 w-full max-w-xs space-y-2.5 pt-1">
             <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
               THE WEDDING OF
             </p>
@@ -179,14 +178,14 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               {brideNickname} &amp; {groomNickname}
             </h1>
 
-            <div className="pt-2 pb-1 space-y-1">
+            <div className="pt-1.5 pb-0.5 space-y-0.5">
               <p className="font-sr-sans text-[11px] text-[#6E5D53]">
                 Kepada Yth.
               </p>
               <p className="font-sr-sans text-[11px] text-[#6E5D53]">
                 Bapak/Ibu/Saudara/i
               </p>
-              <p className="font-sr-sans text-base sm:text-lg font-bold text-[#3C2A21] pt-1 tracking-wide">
+              <p className="font-sr-sans text-base sm:text-lg font-bold text-[#3C2A21] pt-0.5 tracking-wide">
                 {guestName}
               </p>
               <p className="font-sr-sans text-[9px] italic text-[#7A6A60] px-4">
@@ -207,7 +206,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          <div className="h-6" />
+          <div className="h-4" />
         </section>
       )}
 
@@ -482,7 +481,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           {/* FLOATING CONTROLS: MUSIC & BOTTOM NAV (Pinned strictly to Right Sidebar) */}
           {/* ===================================================================== */}
           {/* Floating Rotating Music Disc */}
-          <div className="fixed bottom-20 z-50 pointer-events-none w-full md:w-[50%] lg:w-[45%] xl:w-[42%] right-0 flex justify-end px-4 sm:px-6">
+          <div className="fixed bottom-20 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-end px-4 sm:px-6">
             <button
               type="button"
               onClick={toggleMusic}
@@ -496,7 +495,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
 
           {/* Floating Bottom Navigation Bar (Centered within Right Sidebar on desktop, never spilling to left) */}
-          <div className="fixed bottom-4 z-50 pointer-events-none w-full md:w-[50%] lg:w-[45%] xl:w-[42%] right-0 flex justify-center px-4">
+          <div className="fixed bottom-4 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-center px-4">
             <nav className="pointer-events-auto bg-[#8A4B32]/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-2">
               {[
                 { id: "hero-section", icon: "🏠", label: "Home" },

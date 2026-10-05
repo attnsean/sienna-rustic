@@ -144,21 +144,21 @@ export default async function Home({ params }: Props) {
     <main className="min-h-[100dvh] md:h-[100dvh] w-full flex flex-col md:flex-row bg-[#e8ded1] text-[#3C2A21] md:overflow-hidden relative">
       
       {/* Gambar ke-1: Left side Desktop 2-Column Cover (Hidden on mobile, Fixed on Desktop) */}
-      <aside className="hidden md:flex relative md:w-[50%] lg:w-[55%] xl:w-[58%] md:h-[100dvh] shrink-0 items-center justify-center overflow-hidden bg-[#f5ede2] border-r border-[#8A4B32]/20 select-none">
+      <aside className="hidden md:flex relative md:w-[62%] lg:w-[65%] xl:w-[68%] md:h-[100dvh] shrink-0 items-center justify-center overflow-hidden bg-[#f5ede2] border-r border-[#8A4B32]/20 select-none">
         {/* Layer 1: Parchment texture background */}
         <div 
           className="absolute inset-0 pointer-events-none z-0 select-none bg-cover bg-center opacity-95"
           style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
         />
 
-        {/* Animated Floral Corners (Zoom in Zoom out) - Exact placement matching Gambar 1 */}
+        {/* Animated Floral Corners (Zoom in Zoom out) - Large & prominent matching Gambar 2 reference */}
         {/* Top-Left: SR-02.png flush in top-0 left-0 */}
         <div className="absolute top-0 left-0 pointer-events-none z-10">
           <div className="animate-sr-pulse origin-top-left">
             <img 
               src="/assets/template/SR-02.png" 
               alt="Floral" 
-              className="w-20 md:w-24 lg:w-28 xl:w-32 h-auto object-contain select-none" 
+              className="w-36 md:w-44 lg:w-52 xl:w-60 h-auto object-contain select-none" 
             />
           </div>
         </div>
@@ -169,7 +169,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-01.png" 
               alt="Floral" 
-              className="w-12 md:w-14 lg:w-16 xl:w-20 h-auto object-contain select-none" 
+              className="w-20 md:w-26 lg:w-30 xl:w-34 h-auto object-contain select-none" 
             />
           </div>
         </div>
@@ -180,7 +180,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-01.png" 
               alt="Floral" 
-              className="w-12 md:w-14 lg:w-16 xl:w-20 h-auto object-contain select-none rotate-180" 
+              className="w-24 md:w-30 lg:w-34 xl:w-38 h-auto object-contain select-none rotate-180" 
             />
           </div>
         </div>
@@ -191,7 +191,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-03.png" 
               alt="Floral" 
-              className="w-20 md:w-24 lg:w-28 xl:w-32 h-auto object-contain select-none" 
+              className="w-36 md:w-44 lg:w-52 xl:w-60 h-auto object-contain select-none" 
             />
           </div>
         </div>
