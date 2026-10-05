@@ -306,40 +306,43 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               transition={{ duration: 0.75, ease: [0.25, 0.46, 0.45, 0.94] }}
               className="relative mx-auto mb-6 sm:mb-7 w-[230px] sm:w-[255px] aspect-square flex items-center justify-center select-none"
             >
-              {/* Floral Wing Left - Swaying Animated */}
-              <motion.img 
-                src="/assets/template/arch-wing-left.png" 
-                alt="Floral Wing Left" 
-                className="absolute -left-[74px] sm:-left-[82px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none origin-bottom-right" 
-                animate={{
-                  rotate: [-1.5, 1.8, -1.5],
-                  y: [0, -3.5, 0],
-                  x: [0, -1.5, 0],
-                }}
-                transition={{
-                  duration: 5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              />
+              {/* Floral Wings Wrapper with bottom-clipping so nothing ever shows underneath the arch line */}
+              <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
+                {/* Floral Wing Left - Swaying Animated */}
+                <motion.img 
+                  src="/assets/template/arch-wing-left.png" 
+                  alt="Floral Wing Left" 
+                  className="absolute -left-[74px] sm:-left-[82px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-right" 
+                  animate={{
+                    rotate: [-1.2, 1.5, -1.2],
+                    y: [0, -3.5, 0],
+                    x: [0, -1.5, 0],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
 
-              {/* Floral Wing Right - Swaying Animated */}
-              <motion.img 
-                src="/assets/template/arch-wing-right.png" 
-                alt="Floral Wing Right" 
-                className="absolute -right-[74px] sm:-right-[82px] -top-[4px] h-[107%] w-auto object-contain pointer-events-none z-10 select-none origin-bottom-left" 
-                animate={{
-                  rotate: [1.8, -1.5, 1.8],
-                  y: [0, -3.5, 0],
-                  x: [0, 1.5, 0],
-                }}
-                transition={{
-                  duration: 5.5,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                  delay: 0.6,
-                }}
-              />
+                {/* Floral Wing Right - Swaying Animated */}
+                <motion.img 
+                  src="/assets/template/arch-wing-right.png" 
+                  alt="Floral Wing Right" 
+                  className="absolute -right-[74px] sm:-right-[82px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-left" 
+                  animate={{
+                    rotate: [1.5, -1.2, 1.5],
+                    y: [0, -3.5, 0],
+                    x: [0, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 5.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.6,
+                  }}
+                />
+              </div>
 
               {/* Arch Photo Dome */}
               <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
