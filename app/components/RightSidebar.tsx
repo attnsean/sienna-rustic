@@ -63,11 +63,17 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
 
   // Bank Card Copy State
-  const [copiedBank, setCopiedBank] = useState(false);
-  const copyAccountNumber = (accountNo: string) => {
-    navigator.clipboard.writeText(accountNo);
-    setCopiedBank(true);
-    setTimeout(() => setCopiedBank(false), 2500);
+  const [copiedBankIndex, setCopiedBankIndex] = useState<number | null>(null);
+  const [copiedAddress, setCopiedAddress] = useState(false);
+  const copyAccountNumber = (accountNo: string, index: number) => {
+    navigator.clipboard.writeText(accountNo.replace(/\s/g, ""));
+    setCopiedBankIndex(index);
+    setTimeout(() => setCopiedBankIndex(null), 2500);
+  };
+  const copyAddress = (address: string) => {
+    navigator.clipboard.writeText(address);
+    setCopiedAddress(true);
+    setTimeout(() => setCopiedAddress(false), 2500);
   };
 
   // RSVP Form State
@@ -748,58 +754,97 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          <div className="relative z-20 max-w-sm mx-auto space-y-7">
+          <div className="relative z-20 max-w-sm mx-auto space-y-6">
+            
+            {/* Header Acara */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-center space-y-2 text-white"
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-white font-medium drop-shadow-sm">
+                Waktu &amp; Tempat
+              </h3>
+              <p className="font-sr-sans text-xs text-white/85 max-w-xs mx-auto leading-relaxed">
+                Dengan memohon rahmat dan ridho Allah SWT, kami mengundang Anda untuk hadir pada acara kami:
+              </p>
+              <div className="flex items-center justify-center gap-2 text-white/40 text-xs pt-0.5">
+                <span className="w-8 h-[1px] bg-white/30" />
+                <span>✦ ✦ ✦</span>
+                <span className="w-8 h-[1px] bg-white/30" />
+              </div>
+            </motion.div>
+
             {/* Card 1: Akad Nikah */}
             <motion.div 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
               transition={{ duration: 0.65, ease: "easeOut" }}
-              className="relative rounded-3xl p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2]"
+              className="relative rounded-[28px] p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-[#D4A373]/30 bg-[#FFFDF9]/95 text-[#3C2A21] space-y-4"
               style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
             >
-              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold mb-3">
+              <div className="inline-block px-3.5 py-1 rounded-full bg-[#8A4B32]/10 text-[#8A4B32] font-sr-sans text-[10px] font-bold tracking-[0.2em] uppercase">
+                Acara Sakral
+              </div>
+
+              <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
                 Akad Nikah
-              </h3>
+              </h4>
 
-              {/* Date Block with Vertical Dividers */}
-              <div className="flex items-center justify-center gap-4 text-[#8A4B32] my-2">
-                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Sabtu</span>
-                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
-                <div className="flex flex-col items-center">
-                  <span className="font-sr-sans text-3xl sm:text-4xl font-extrabold leading-none text-[#8A4B32]">23</span>
-                  <span className="font-sr-sans text-xs font-semibold text-[#8A4B32] tracking-wider mt-0.5">2026</span>
+              {/* Date Block with Balanced Hierarchy */}
+              <div className="flex items-center justify-center gap-3 py-2 border-y border-[#8A4B32]/15 max-w-[270px] mx-auto">
+                <div className="text-right flex-1">
+                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Sabtu</span>
+                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Pagi Hari</span>
                 </div>
-                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
-                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Mei</span>
+                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                <div className="px-2 text-center">
+                  <span className="block font-serif text-3xl sm:text-4xl font-extrabold text-[#8A4B32] leading-none">23</span>
+                  <span className="block font-sr-sans text-[10px] font-bold tracking-widest text-[#8A4B32] uppercase mt-0.5">2026</span>
+                </div>
+                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                <div className="text-left flex-1">
+                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Mei</span>
+                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Bulan Baik</span>
+                </div>
               </div>
 
-              {/* Time */}
-              <div className="flex items-center justify-center gap-1.5 my-3 text-xs sm:text-sm font-bold text-[#3C2A21] font-sr-sans">
-                <span>🕒</span>
-                <span>08:00 WIB</span>
+              {/* Time Pill Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8A4B32] text-white font-sr-sans text-xs font-semibold shadow-sm">
+                <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Pukul 08:00 WIB - Selesai</span>
               </div>
 
-              {/* Location */}
-              <div className="mt-4 mb-5 space-y-1">
-                <h5 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32]">
-                  Lokasi Acara
+              {/* Location Info */}
+              <div className="pt-1 space-y-1">
+                <h5 className="font-sr-sans font-bold text-sm text-[#3C2A21]">
+                  Villa Nusa Permai
                 </h5>
-                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed px-2">
-                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed max-w-[280px] mx-auto">
+                  Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur
                 </p>
               </div>
 
               {/* Google Maps Button */}
-              <a 
-                href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
-                target="_blank" 
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs sm:text-sm font-medium px-6 py-2 rounded-full shadow-md active:scale-95 transition-all"
-              >
-                <span>📍</span>
-                <span>Google Maps</span>
-              </a>
+              <div className="pt-1">
+                <a 
+                  href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
+                >
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                  </svg>
+                  <span>Buka Google Maps</span>
+                </a>
+              </div>
             </motion.div>
 
             {/* Card 2: Resepsi */}
@@ -807,53 +852,71 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.65, delay: 0.15, ease: "easeOut" }}
-              className="relative rounded-3xl p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2]"
+              transition={{ duration: 0.65, delay: 0.12, ease: "easeOut" }}
+              className="relative rounded-[28px] p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-[#D4A373]/30 bg-[#FFFDF9]/95 text-[#3C2A21] space-y-4"
               style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
             >
-              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold mb-3">
+              <div className="inline-block px-3.5 py-1 rounded-full bg-[#8A4B32]/10 text-[#8A4B32] font-sr-sans text-[10px] font-bold tracking-[0.2em] uppercase">
+                Perayaan &amp; Ramah Tamah
+              </div>
+
+              <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
                 Resepsi
-              </h3>
+              </h4>
 
-              {/* Date Block with Vertical Dividers */}
-              <div className="flex items-center justify-center gap-4 text-[#8A4B32] my-2">
-                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Sabtu</span>
-                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
-                <div className="flex flex-col items-center">
-                  <span className="font-sr-sans text-3xl sm:text-4xl font-extrabold leading-none text-[#8A4B32]">23</span>
-                  <span className="font-sr-sans text-xs font-semibold text-[#8A4B32] tracking-wider mt-0.5">2026</span>
+              {/* Date Block with Balanced Hierarchy */}
+              <div className="flex items-center justify-center gap-3 py-2 border-y border-[#8A4B32]/15 max-w-[270px] mx-auto">
+                <div className="text-right flex-1">
+                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Sabtu</span>
+                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Siang Hari</span>
                 </div>
-                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
-                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Mei</span>
+                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                <div className="px-2 text-center">
+                  <span className="block font-serif text-3xl sm:text-4xl font-extrabold text-[#8A4B32] leading-none">23</span>
+                  <span className="block font-sr-sans text-[10px] font-bold tracking-widest text-[#8A4B32] uppercase mt-0.5">2026</span>
+                </div>
+                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
+                <div className="text-left flex-1">
+                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Mei</span>
+                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Bulan Baik</span>
+                </div>
               </div>
 
-              {/* Time */}
-              <div className="flex items-center justify-center gap-1.5 my-3 text-xs sm:text-sm font-bold text-[#3C2A21] font-sr-sans">
-                <span>🕒</span>
-                <span>11:00 WIB</span>
+              {/* Time Pill Badge */}
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8A4B32] text-white font-sr-sans text-xs font-semibold shadow-sm">
+                <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" />
+                  <polyline points="12 6 12 12 16 14" />
+                </svg>
+                <span>Pukul 11:00 WIB - Selesai</span>
               </div>
 
-              {/* Location */}
-              <div className="mt-4 mb-5 space-y-1">
-                <h5 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32]">
-                  Lokasi Acara
+              {/* Location Info */}
+              <div className="pt-1 space-y-1">
+                <h5 className="font-sr-sans font-bold text-sm text-[#3C2A21]">
+                  Villa Nusa Permai
                 </h5>
-                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed px-2">
-                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed max-w-[280px] mx-auto">
+                  Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur
                 </p>
               </div>
 
               {/* Google Maps Button */}
-              <a 
-                href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
-                target="_blank" 
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs sm:text-sm font-medium px-6 py-2 rounded-full shadow-md active:scale-95 transition-all"
-              >
-                <span>📍</span>
-                <span>Google Maps</span>
-              </a>
+              <div className="pt-1">
+                <a 
+                  href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
+                  target="_blank" 
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
+                >
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                  </svg>
+                  <span>Buka Google Maps</span>
+                </a>
+              </div>
             </motion.div>
+
           </div>
         </section>
 
@@ -892,94 +955,120 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          <div className="relative z-20 max-w-sm mx-auto">
-            {/* Title */}
-            <motion.h3 
+          <div className="relative z-20 max-w-sm mx-auto space-y-6">
+            {/* Title & Flourish */}
+            <motion.div 
               initial={{ opacity: 0, y: -20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: false, amount: 0.3 }}
               transition={{ duration: 0.6, ease: "easeOut" }}
-              className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold text-center mb-8"
+              className="text-center space-y-2 mb-6"
             >
-              Love Story
-            </motion.h3>
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold drop-shadow-sm">
+                Love Story
+              </h3>
+              <p className="font-sr-sans text-xs text-[#5C4A40] max-w-xs mx-auto leading-relaxed">
+                Perjalanan cinta kami dari awal bertemu hingga melangkah ke pelaminan.
+              </p>
+              <div className="flex items-center justify-center gap-2 text-[#8A4B32]/35 text-xs pt-0.5">
+                <span className="w-8 h-[1px] bg-[#8A4B32]/25" />
+                <span>✦ ✦ ✦</span>
+                <span className="w-8 h-[1px] bg-[#8A4B32]/25" />
+              </div>
+            </motion.div>
 
-            {/* Timeline Container */}
-            <div className="relative pl-6 sm:pl-8 space-y-6">
-              {/* Vertical Timeline Guide Line */}
-              <div className="absolute left-[13px] sm:left-[17px] top-3 bottom-5 w-[2px] bg-[#8A4B32]/35" />
+            {/* Timeline Spine & Cards */}
+            <div className="relative pl-7 sm:pl-8 space-y-6 text-left">
+              {/* Vertical Spine */}
+              <div className="absolute left-[13px] sm:left-[15px] top-4 bottom-5 w-[2px] bg-gradient-to-b from-[#8A4B32]/40 via-[#8A4B32]/25 to-transparent" />
 
               {/* Story 1: Awal Kisah */}
               <motion.div 
-                initial={{ opacity: 0, x: 25 }}
+                initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.65, ease: "easeOut" }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
                 className="relative"
               >
-                {/* Node with heart */}
-                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
+                {/* Node */}
+                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
                   ♥
                 </div>
 
-                {/* Speech Bubble Card */}
-                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
-                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
-                    &quot; awal kisah &quot;
-                  </h4>
-                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
-                    Tanpa sengaja semesta mempertemukan kami lewat dunia maya. Dari obrolan ringan di sosial media instagram, kami pertama bertemu pada tanggal 05 Maret 2024, tidak ada yang pernah menyangka bahwa dari pertemuan itu tumbuh rasa hangat hingga hati kami sepakat untuk saling menjaga. Perjalanan kami bukan hanya tentang kebahagiaan, tapi tentang proses saling mendewasakan. Kami belajar menyatukan perbedaan, membangun fondasi kepercayaan, dan meyakini bahwa setiap tantangan adalah cara kami untuk semakin kokoh sebagai satu kesatuan.
+                {/* Card */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
+                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
+                      Awal Pertemuan
+                    </h4>
+                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
+                      05 Maret 2024
+                    </span>
+                  </div>
+                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
+                    Tanpa sengaja semesta mempertemukan kami lewat dunia maya. Dari obrolan ringan di sosial media, kami pertama bertemu pada tanggal 05 Maret 2024. Tidak ada yang menyangka bahwa dari pertemuan sederhana itu tumbuh rasa hangat hingga hati kami sepakat untuk saling menjaga dan melengkapi.
                   </p>
                 </div>
               </motion.div>
 
               {/* Story 2: Lamaran */}
               <motion.div 
-                initial={{ opacity: 0, x: 25 }}
+                initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
+                transition={{ duration: 0.6, delay: 0.1, ease: "easeOut" }}
                 className="relative"
               >
-                {/* Node with heart */}
-                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
-                  ♥
+                {/* Node */}
+                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
+                  💍
                 </div>
 
-                {/* Speech Bubble Card */}
-                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
-                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
-                    &quot; lamaran &quot;
-                  </h4>
-                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
-                    Kehendak-Nya menuntun kami pada sebuah ikatan suci yang di cintai-Nya. Di titik ini, kami memilih untuk berhenti mencari. Momen lamaran berlangsung pada tanggal 29 Maret 2026 menjadi bukti nyata dari kesungguhan hati-sebuah pernyataan bahwa kami siap melangkah lebih jauh.
+                {/* Card */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
+                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
+                      Ikatan Suci (Lamaran)
+                    </h4>
+                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
+                      29 Maret 2026
+                    </span>
+                  </div>
+                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
+                    Kehendak-Nya menuntun kami pada sebuah ikatan suci yang diridhoi-Nya. Di titik ini, kami memilih untuk berhenti mencari. Momen lamaran pada 29 Maret 2026 menjadi bukti nyata dari kesungguhan hati untuk siap melangkah bersama seumur hidup.
                   </p>
                 </div>
               </motion.div>
 
-              {/* Story 3: Awal Selamanya */}
+              {/* Story 3: Menuju Pelaminan */}
               <motion.div 
-                initial={{ opacity: 0, x: 25 }}
+                initial={{ opacity: 0, x: 20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: false, amount: 0.25 }}
-                transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
+                transition={{ duration: 0.6, delay: 0.2, ease: "easeOut" }}
                 className="relative"
               >
-                {/* Node with heart */}
-                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
-                  ♥
+                {/* Node */}
+                <div className="absolute -left-[27px] sm:-left-[29px] top-3.5 w-7 h-7 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#6E3622] flex items-center justify-center text-white text-[11px] shadow-md border-2 border-[#f5ede2] ring-2 ring-[#8A4B32]/20 z-10">
+                  ✨
                 </div>
 
-                {/* Speech Bubble Card */}
-                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
-                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
-                    &quot; awal selamanya &quot;
-                  </h4>
-                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
-                    Hari ini, dua doa menyatu menjadi satu tujuan. Di hadapan sang pencipta, kami mengukir janji suci untuk memulai hidup baru. Pernikahan ini bukanlah akhir, melainkan gerbang menuju petualangan abadi yang kami tempuh bersama.
+                {/* Card */}
+                <div className="bg-white/90 backdrop-blur-sm rounded-2xl p-5 shadow-md border border-[#8A4B32]/15 space-y-2">
+                  <div className="flex items-center justify-between gap-2 border-b border-[#8A4B32]/10 pb-2">
+                    <h4 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32] tracking-wide">
+                      Awal Selamanya
+                    </h4>
+                    <span className="font-sr-sans text-[10px] font-semibold text-[#8C7A70] bg-[#8A4B32]/10 px-2.5 py-0.5 rounded-full">
+                      23 Mei 2026
+                    </span>
+                  </div>
+                  <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed">
+                    Dan tibalah hari yang paling kami nantikan. Bukan sekadar merayakan cinta kami berdua, tapi menyatukan dua keluarga besar dalam ikatan suci pernikahan. Hari di mana perjalanan baru kami resmi dimulai.
                   </p>
                 </div>
               </motion.div>
+
             </div>
           </div>
         </section>
@@ -1148,6 +1237,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
 
           <div className="relative z-20 max-w-sm mx-auto text-center space-y-6">
+            
             {/* Title & Subtitle */}
             <motion.div
               initial={{ opacity: 0, y: -20 }}
@@ -1156,71 +1246,163 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               transition={{ duration: 0.6, ease: "easeOut" }}
               className="space-y-2.5"
             >
-              <h3 className="font-sr-script text-4xl sm:text-5xl font-medium text-white">
+              <h3 className="font-sr-script text-4xl sm:text-5xl font-medium text-white drop-shadow-sm">
                 Wedding Gift
               </h3>
-              <p className="font-sr-sans text-xs text-white/90 leading-relaxed px-4">
-                Doa Restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih, Anda dapat memberi melalui dibawah ini.
+              <p className="font-sr-sans text-xs text-white/90 leading-relaxed px-3">
+                Doa restu Anda merupakan karunia yang sangat berarti bagi kami. Namun jika memberi adalah ungkapan tanda kasih, Anda dapat memberi melalui rekening di bawah ini:
               </p>
+              <div className="flex items-center justify-center gap-2 text-white/40 text-xs pt-0.5">
+                <span className="w-8 h-[1px] bg-white/30" />
+                <span>✦ ✦ ✦</span>
+                <span className="w-8 h-[1px] bg-white/30" />
+              </div>
             </motion.div>
 
-            {/* ATM Debit Card Matching Reference */}
-            <motion.div
-              initial={{ opacity: 0, scale: 0.92, y: 25 }}
-              whileInView={{ opacity: 1, scale: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.65, ease: "easeOut" }}
-              className="relative rounded-3xl p-6 sm:p-7 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2] text-[#3C2A21] max-w-xs mx-auto"
-              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
-            >
-              {/* Card Top Row: BCA Logo & EMV Chip */}
-              <div className="flex items-center justify-between mb-6">
-                {/* BCA Badge */}
-                <div className="bg-white rounded-lg px-2.5 py-1 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1">
-                  <div className="w-4 h-4 rounded-full bg-[#00529C] flex items-center justify-center text-[9px] text-white font-bold">
-                    B
+            {/* List of 2 Bank Cards */}
+            <div className="space-y-5">
+              
+              {/* Card 1: BCA (Mempelai Wanita - Sopiah) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 25 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.65, ease: "easeOut" }}
+                className="relative rounded-[26px] p-6 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#FFFDF9]/95 text-[#3C2A21] max-w-xs mx-auto"
+                style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
+              >
+                {/* Card Top: BCA Logo & EMV Chip */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-[#00529C] flex items-center justify-center text-[10px] text-white font-extrabold">
+                      B
+                    </div>
+                    <span className="font-sans font-extrabold text-sm tracking-wider text-[#00529C]">BCA</span>
                   </div>
-                  <span className="font-sans font-extrabold text-sm tracking-wider text-[#00529C]">BCA</span>
+
+                  {/* EMV Gold Chip Icon */}
+                  <div className="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-amber-600/40 shadow-inner flex flex-col justify-around p-1">
+                    <div className="w-full h-[1px] bg-amber-700/35" />
+                    <div className="w-full h-[1px] bg-amber-700/35" />
+                  </div>
                 </div>
 
-                {/* EMV Gold Chip Icon */}
-                <div className="w-10 h-8 rounded-md bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 border border-amber-600/50 shadow-inner flex flex-col justify-around p-1">
-                  <div className="w-full h-[1px] bg-amber-700/40" />
-                  <div className="w-full h-[1px] bg-amber-700/40" />
-                </div>
-              </div>
-
-              {/* No Rekening */}
-              <div className="space-y-0.5 mb-4">
-                <span className="font-sr-sans text-[11px] font-semibold text-[#6E5D53]">
-                  No Rekening
-                </span>
-                <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
-                  3480994875
-                </p>
-              </div>
-
-              {/* Atas Nama & Copy Button */}
-              <div className="flex items-end justify-between pt-1">
-                <div>
-                  <span className="font-sr-sans text-[11px] font-semibold text-[#6E5D53]">
-                    Atas Nama
+                {/* Account Number */}
+                <div className="space-y-1 mb-4">
+                  <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                    Nomor Rekening
                   </span>
-                  <p className="font-sr-sans text-sm font-bold italic text-[#3C2A21]">
-                    Sopiah
+                  <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
+                    3480 9948 75
                   </p>
                 </div>
 
+                {/* Account Holder & Copy Button */}
+                <div className="flex items-end justify-between pt-1 border-t border-[#8A4B32]/10">
+                  <div>
+                    <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                      Atas Nama
+                    </span>
+                    <p className="font-sr-sans text-sm font-bold text-[#3C2A21]">
+                      Sopiah
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => copyAccountNumber("3480994875", 1)}
+                    className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-4 py-2 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                  >
+                    <span>{copiedBankIndex === 1 ? "✓" : "📋"}</span>
+                    <span>{copiedBankIndex === 1 ? "Tersalin!" : "Salin"}</span>
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Card 2: Bank Mandiri (Mempelai Pria - Marvel) */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.94, y: 25 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.65, delay: 0.12, ease: "easeOut" }}
+                className="relative rounded-[26px] p-6 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#FFFDF9]/95 text-[#3C2A21] max-w-xs mx-auto"
+                style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
+              >
+                {/* Card Top: Mandiri Logo & EMV Chip */}
+                <div className="flex items-center justify-between mb-5">
+                  <div className="bg-white rounded-xl px-3 py-1.5 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1.5">
+                    <div className="w-5 h-5 rounded-full bg-[#003d79] flex items-center justify-center text-[10px] text-[#ffb81c] font-black">
+                      M
+                    </div>
+                    <span className="font-sans font-extrabold text-sm tracking-wider text-[#003d79]">MANDIRI</span>
+                  </div>
+
+                  {/* EMV Gold Chip Icon */}
+                  <div className="w-10 h-8 rounded-lg bg-gradient-to-tr from-amber-400 via-yellow-200 to-amber-500 border border-amber-600/40 shadow-inner flex flex-col justify-around p-1">
+                    <div className="w-full h-[1px] bg-amber-700/35" />
+                    <div className="w-full h-[1px] bg-amber-700/35" />
+                  </div>
+                </div>
+
+                {/* Account Number */}
+                <div className="space-y-1 mb-4">
+                  <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                    Nomor Rekening
+                  </span>
+                  <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
+                    1320 0284 9182 3
+                  </p>
+                </div>
+
+                {/* Account Holder & Copy Button */}
+                <div className="flex items-end justify-between pt-1 border-t border-[#8A4B32]/10">
+                  <div>
+                    <span className="font-sr-sans text-[10px] font-bold uppercase tracking-wider text-[#7C6A60]">
+                      Atas Nama
+                    </span>
+                    <p className="font-sr-sans text-sm font-bold text-[#3C2A21]">
+                      Marvel
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => copyAccountNumber("1320028491823", 2)}
+                    className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-4 py-2 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                  >
+                    <span>{copiedBankIndex === 2 ? "✓" : "📋"}</span>
+                    <span>{copiedBankIndex === 2 ? "Tersalin!" : "Salin"}</span>
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Physical Gift Option / Kirim Kado Fisik */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.6 }}
+                className="rounded-2xl p-4 bg-white/10 border border-white/20 text-center max-w-xs mx-auto space-y-2 backdrop-blur-sm"
+              >
+                <div className="flex items-center justify-center gap-1.5 text-xs text-[#E6C280] font-bold uppercase tracking-wider">
+                  <span>🎁</span>
+                  <span>Kirim Kado Fisik</span>
+                </div>
+                <p className="text-[11px] text-white/90 leading-relaxed">
+                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                </p>
                 <button
                   type="button"
-                  onClick={() => copyAccountNumber("3480994875")}
-                  className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                  onClick={() => copyAddress("Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur")}
+                  className="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 text-white text-[11px] px-3.5 py-1.5 rounded-full border border-white/20 transition-all cursor-pointer"
                 >
-                  <span>📋</span>
-                  <span>{copiedBank ? "Tersalin!" : "Salin"}</span>
+                  <span>{copiedAddress ? "✓" : "📦"}</span>
+                  <span>{copiedAddress ? "Alamat Tersalin!" : "Salin Alamat"}</span>
                 </button>
-              </div>
-            </motion.div>
+              </motion.div>
+
+            </div>
+
           </div>
         </section>
 
@@ -1614,23 +1796,14 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           <footer className="relative z-20 bg-gradient-to-b from-[#632E1A] via-[#4D2313] to-[#331509] text-white pt-10 pb-24 px-6 text-center shadow-2xl border-t border-[#D4A373]/25">
             <div className="max-w-sm mx-auto space-y-5">
               
-              {/* Official SeraStory Brand Logo */}
-              <div className="flex flex-col items-center justify-center space-y-2">
-                <div className="h-16 w-auto flex items-center justify-center">
-                  <img 
-                    src="/logo-white.png" 
-                    alt="SeraStory Logo" 
-                    className="h-full w-auto object-contain filter drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] opacity-95" 
-                  />
-                </div>
-                <div className="text-center space-y-0.5">
-                  <h4 className="font-serif font-bold text-base tracking-[0.25em] text-[#FAF5F0] uppercase">
-                    SERASTORY
-                  </h4>
-                  <p className="font-sr-sans text-[9px] tracking-[0.28em] text-[#E6C280]/85 uppercase font-medium">
-                    Bespoke Digital Invitation
-                  </p>
-                </div>
+              {/* SeraStory Branding */}
+              <div className="text-center space-y-1">
+                <h4 className="font-serif font-bold text-lg sm:text-xl tracking-[0.28em] text-[#FAF5F0] uppercase">
+                  SERASTORY
+                </h4>
+                <p className="font-sr-sans text-[9px] sm:text-[10px] tracking-[0.28em] text-[#E6C280]/85 uppercase font-medium">
+                  Bespoke Digital Invitation
+                </p>
               </div>
 
               {/* Social & Contact Badges with Crisp Vector Icons */}
