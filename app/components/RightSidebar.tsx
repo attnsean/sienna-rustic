@@ -122,23 +122,37 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
       />
 
       {/* ========================================================================= */}
-      {/* GAMBAR KE-2: SECTION 1 - COVER MOBILE / OPENING SCREEN */}
+      {/* SECTION 1 - COVER MOBILE / OPENING SCREEN */}
+      {/* Photo background + parchment overlay like Gambar 1 */}
       {/* ========================================================================= */}
       {!isOpen && (
-        <section className="relative min-h-[100dvh] w-full flex flex-col justify-between items-center text-center px-6 py-10 overflow-hidden select-none bg-[#f5ede2]">
-          {/* Background Texture SR-bg.jpg */}
+        <section className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-6 overflow-hidden select-none bg-[#3C2A21]">
+          
+          {/* Layer 1: User's prewedding photo as FULL background */}
+          <div className="absolute inset-0 pointer-events-none z-0">
+            <img 
+              src={coverPhoto} 
+              alt={`${brideNickname} & ${groomNickname}`} 
+              className="w-full h-full object-cover object-center"
+            />
+          </div>
+
+          {/* Layer 2: Parchment texture overlay with opacity (warm rustic feel) */}
           <div 
-            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
-            style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
+            className="absolute inset-0 pointer-events-none z-[1] opacity-55"
+            style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
           />
 
-          {/* Animated Floral Corners - Section 1 has flowers ONLY at bottom corners matching reference */}
+          {/* Layer 3: Gradient from top (transparent to show photo) to bottom (darker for text readability) */}
+          <div className="absolute inset-0 pointer-events-none z-[2] bg-gradient-to-b from-transparent via-[#f5ede2]/30 to-[#f5ede2]/80" />
+
+          {/* Animated Floral Corners - bottom corners */}
           <div className="absolute bottom-0 left-0 pointer-events-none z-10">
             <div className="animate-sr-pulse-alt origin-bottom-left">
               <img 
                 src="/assets/template/SR-01.png" 
                 alt="Floral decoration" 
-                className="w-24 sm:w-32 h-auto object-contain select-none rotate-180" 
+                className="w-20 sm:w-28 h-auto object-contain select-none rotate-180" 
               />
             </div>
           </div>
@@ -147,23 +161,16 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               <img 
                 src="/assets/template/SR-03.png" 
                 alt="Floral decoration" 
-                className="w-28 sm:w-36 h-auto object-contain select-none" 
+                className="w-24 sm:w-32 h-auto object-contain select-none" 
               />
             </div>
           </div>
 
-          {/* Top Prewedding Photo Arch */}
-          <div className="relative z-20 w-full max-w-[280px] aspect-[4/3] rounded-t-full overflow-hidden shadow-2xl border-2 border-[#8A4B32]/30 mt-2">
-            <img 
-              src={coverPhoto} 
-              alt={`${brideNickname} & ${groomNickname}`} 
-              className="w-full h-full object-cover object-center"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
-          </div>
+          {/* Spacer to push content down (photo shows at top) */}
+          <div className="relative z-20 flex-1 min-h-[35vh]" />
 
           {/* Center Info */}
-          <div className="relative z-20 w-full max-w-xs space-y-3 my-auto pt-2">
+          <div className="relative z-20 w-full max-w-xs space-y-3 pt-2">
             <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
               THE WEDDING OF
             </p>
@@ -226,7 +233,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-02.png" 
                   alt="Floral" 
-                  className="w-24 sm:w-32 h-auto object-contain select-none" 
+                  className="w-16 sm:w-20 h-auto object-contain select-none" 
                 />
               </div>
             </div>
@@ -235,7 +242,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-01.png" 
                   alt="Floral" 
-                  className="w-20 sm:w-26 h-auto object-contain select-none" 
+                  className="w-10 sm:w-14 h-auto object-contain select-none" 
                 />
               </div>
             </div>
@@ -244,7 +251,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-01.png" 
                   alt="Floral" 
-                  className="w-20 sm:w-26 h-auto object-contain select-none rotate-180" 
+                  className="w-10 sm:w-14 h-auto object-contain select-none rotate-180" 
                 />
               </div>
             </div>
@@ -253,7 +260,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src="/assets/template/SR-03.png" 
                   alt="Floral" 
-                  className="w-24 sm:w-32 h-auto object-contain select-none" 
+                  className="w-16 sm:w-20 h-auto object-contain select-none" 
                 />
               </div>
             </div>

@@ -138,17 +138,30 @@ export default async function Home({ params }: Props) {
   };
 
   const formattedDate = formatDateDisplay(weddingDateRaw);
+  const coverPhoto = dbData.project?.cover_photo_url || dbData.project?.opening_photo_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop";
 
   return (
     <main className="min-h-[100dvh] w-full flex flex-col md:flex-row bg-[#e8ded1] text-[#3C2A21] overflow-hidden relative">
       
       {/* Gambar ke-1: Left side Desktop 2-Column Cover (Hidden on mobile) */}
       <aside className="hidden md:flex relative md:w-[50%] lg:w-[55%] xl:w-[58%] md:h-[100dvh] sticky top-0 items-center justify-center overflow-hidden bg-[#f5ede2] border-r border-[#8A4B32]/20 select-none">
-        {/* Background Texture SR-bg.jpg */}
+        {/* Layer 1: User's prewedding photo as FULL background */}
+        <div className="absolute inset-0 pointer-events-none z-0 select-none">
+          <img 
+            src={coverPhoto} 
+            alt="Prewedding" 
+            className="w-full h-full object-cover object-center"
+          />
+        </div>
+
+        {/* Layer 2: Parchment texture overlay with opacity */}
         <div 
-          className="absolute inset-0 bg-cover bg-center opacity-95 select-none pointer-events-none"
-          style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
+          className="absolute inset-0 pointer-events-none z-[1] select-none opacity-60"
+          style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')`, backgroundSize: 'cover', backgroundPosition: 'center' }}
         />
+
+        {/* Layer 3: Gradient for text readability */}
+        <div className="absolute inset-0 pointer-events-none z-[2] bg-gradient-to-b from-transparent via-[#f5ede2]/20 to-[#f5ede2]/60" />
 
         {/* Animated Floral Corners (Zoom in Zoom out) - Exact placement matching Gambar 1 */}
         {/* Top-Left: SR-02.png flush in top-0 left-0 */}
@@ -157,7 +170,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-02.png" 
               alt="Floral" 
-              className="w-32 md:w-36 lg:w-44 xl:w-52 h-auto object-contain select-none" 
+              className="w-20 md:w-24 lg:w-28 xl:w-32 h-auto object-contain select-none" 
             />
           </div>
         </div>
@@ -168,7 +181,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-01.png" 
               alt="Floral" 
-              className="w-24 md:w-28 lg:w-36 xl:w-40 h-auto object-contain select-none" 
+              className="w-12 md:w-14 lg:w-16 xl:w-20 h-auto object-contain select-none" 
             />
           </div>
         </div>
@@ -179,7 +192,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-01.png" 
               alt="Floral" 
-              className="w-24 md:w-28 lg:w-36 xl:w-40 h-auto object-contain select-none rotate-180" 
+              className="w-12 md:w-14 lg:w-16 xl:w-20 h-auto object-contain select-none rotate-180" 
             />
           </div>
         </div>
@@ -190,7 +203,7 @@ export default async function Home({ params }: Props) {
             <img 
               src="/assets/template/SR-03.png" 
               alt="Floral" 
-              className="w-32 md:w-36 lg:w-44 xl:w-52 h-auto object-contain select-none" 
+              className="w-20 md:w-24 lg:w-28 xl:w-32 h-auto object-contain select-none" 
             />
           </div>
         </div>
