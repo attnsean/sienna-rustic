@@ -39,8 +39,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
   // Exact couple photo matching reference
   const coverPhoto = project?.cover_photo_url || project?.opening_photo_url || "/assets/template/couple-cover.jpg";
-  const bridePhoto = project?.bride_photo_url || "/assets/template/couple-cover.jpg";
-  const groomPhoto = project?.groom_photo_url || "/assets/template/couple-cover.jpg";
+  const bridePhoto = project?.bride_photo_url || "/assets/template/bride-portrait.jpg";
+  const groomPhoto = project?.groom_photo_url || "/assets/template/groom-portrait.jpg";
 
   // Event Info
   const mainEvent = events && events.length > 0 ? events[0] : null;
@@ -430,7 +430,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src={coverPhoto} 
                   alt={`${brideNickname} & ${groomNickname}`} 
-                  className="w-full h-full object-cover object-[center_28%]" 
+                  className="w-full h-full object-cover object-top" 
                 />
               </div>
             </motion.div>
@@ -1374,7 +1374,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 <img 
                   src={coverPhoto} 
                   alt={`${brideNickname} & ${groomNickname}`} 
-                  className="w-full h-full object-cover object-[center_28%]" 
+                  className="w-full h-full object-cover object-top" 
                 />
               </div>
             </motion.div>
