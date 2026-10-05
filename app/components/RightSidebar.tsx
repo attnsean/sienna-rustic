@@ -48,6 +48,87 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
   // Countdown timer calculations
   const [timeLeft, setTimeLeft] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+
+  // Gallery State
+  const galleryImages = [
+    "/assets/template/01-09.png",
+    "/assets/template/01-10.png",
+    "/assets/template/01-11.png",
+    "/assets/template/01-12.png",
+    "/assets/template/01-13.png",
+    "/assets/template/01-14.png",
+    "/assets/template/01-15.png",
+  ];
+  const [activePhotoIdx, setActivePhotoIdx] = useState(0);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+
+  // Bank Card Copy State
+  const [copiedBank, setCopiedBank] = useState(false);
+  const copyAccountNumber = (accountNo: string) => {
+    navigator.clipboard.writeText(accountNo);
+    setCopiedBank(true);
+    setTimeout(() => setCopiedBank(false), 2500);
+  };
+
+  // RSVP Form State
+  const [rsvpName, setRsvpName] = useState("");
+  const [rsvpMessage, setRsvpMessage] = useState("");
+  const [rsvpStatus, setRsvpStatus] = useState<"hadir" | "tidak_hadir">("hadir");
+  const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
+  const [rsvpSuccessMsg, setRsvpSuccessMsg] = useState(false);
+
+  // Wishes List State (Matching user reference image 4 + dynamic entries)
+  const [wishesList, setWishesList] = useState([
+    { name: "Erika", message: "Opiiii selamaaaattt😍 lancar sampai hari h yaaaa❤️", initial: "ER", color: "bg-[#5B8C5A]" },
+    { name: "RAISA 8i N3RIZI", message: "selamat ya pak,semoga lancar sampai hari H'y,semoga jadi keluarga samawa,barokah dan langgeng bahagia dunia akhirat ya....aamiin", initial: "RN", color: "bg-[#56B4D3]" },
+    { name: "Fajar ramadan", message: "Semoga lancar sampai akhir pak🫡", initial: "FR", color: "bg-[#E6C654]" },
+    { name: "rafa", message: "Selamat menempuh hidup baru, semoga bahagia selalu!", initial: "RA", color: "bg-[#8A9BA8]" },
+  ]);
+
+  const handleSubmitRsvp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!rsvpName.trim() || !rsvpMessage.trim()) return;
+
+    setIsSubmittingRsvp(true);
+    try {
+      await fetch("/api/wishes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          project_id: project?.id || "default",
+          guest_id: guest?.id || null,
+          name: rsvpName,
+          message: rsvpMessage,
+        }),
+      });
+
+      // Calculate initial letters
+      const initials = rsvpName
+        .trim()
+        .split(" ")
+        .map((w) => w[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+
+      const newEntry = {
+        name: rsvpName,
+        message: rsvpMessage,
+        initial: initials || "UC",
+        color: "bg-[#8A4B32]",
+      };
+
+      setWishesList((prev) => [newEntry, ...prev]);
+      setRsvpName("");
+      setRsvpMessage("");
+      setRsvpSuccessMsg(true);
+      setTimeout(() => setRsvpSuccessMsg(false), 3500);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsSubmittingRsvp(false);
+    }
+  };
   useEffect(() => {
     const target = new Date(weddingDateRaw).getTime();
     const updateCountdown = () => {
@@ -612,6 +693,745 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
           </div>
         </section>
 
+        {/* ===================================================================== */}
+        {/* SECTION 5 - ACARA / JADWAL PERNIKAHAN (Matching Referensi Gambar 1) */}
+        {/* ===================================================================== */}
+        <section 
+          id="event-section"
+          className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#8A4B32]"
+        >
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+          </div>
+          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+          </div>
+          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto space-y-7">
+            {/* Card 1: Akad Nikah */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="relative rounded-3xl p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2]"
+              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold mb-3">
+                Akad Nikah
+              </h3>
+
+              {/* Date Block with Vertical Dividers */}
+              <div className="flex items-center justify-center gap-4 text-[#8A4B32] my-2">
+                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Sabtu</span>
+                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
+                <div className="flex flex-col items-center">
+                  <span className="font-sr-sans text-3xl sm:text-4xl font-extrabold leading-none text-[#8A4B32]">23</span>
+                  <span className="font-sr-sans text-xs font-semibold text-[#8A4B32] tracking-wider mt-0.5">2026</span>
+                </div>
+                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
+                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Mei</span>
+              </div>
+
+              {/* Time */}
+              <div className="flex items-center justify-center gap-1.5 my-3 text-xs sm:text-sm font-bold text-[#3C2A21] font-sr-sans">
+                <span>🕒</span>
+                <span>08:00 WIB</span>
+              </div>
+
+              {/* Location */}
+              <div className="mt-4 mb-5 space-y-1">
+                <h5 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32]">
+                  Lokasi Acara
+                </h5>
+                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed px-2">
+                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                </p>
+              </div>
+
+              {/* Google Maps Button */}
+              <a 
+                href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs sm:text-sm font-medium px-6 py-2 rounded-full shadow-md active:scale-95 transition-all"
+              >
+                <span>📍</span>
+                <span>Google Maps</span>
+              </a>
+            </motion.div>
+
+            {/* Card 2: Resepsi */}
+            <motion.div 
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.65, delay: 0.15, ease: "easeOut" }}
+              className="relative rounded-3xl p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2]"
+              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold mb-3">
+                Resepsi
+              </h3>
+
+              {/* Date Block with Vertical Dividers */}
+              <div className="flex items-center justify-center gap-4 text-[#8A4B32] my-2">
+                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Sabtu</span>
+                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
+                <div className="flex flex-col items-center">
+                  <span className="font-sr-sans text-3xl sm:text-4xl font-extrabold leading-none text-[#8A4B32]">23</span>
+                  <span className="font-sr-sans text-xs font-semibold text-[#8A4B32] tracking-wider mt-0.5">2026</span>
+                </div>
+                <div className="h-10 w-[1.5px] bg-[#8A4B32]/35" />
+                <span className="font-sr-sans text-sm sm:text-base font-semibold text-[#5C4A40]">Mei</span>
+              </div>
+
+              {/* Time */}
+              <div className="flex items-center justify-center gap-1.5 my-3 text-xs sm:text-sm font-bold text-[#3C2A21] font-sr-sans">
+                <span>🕒</span>
+                <span>11:00 WIB</span>
+              </div>
+
+              {/* Location */}
+              <div className="mt-4 mb-5 space-y-1">
+                <h5 className="font-sr-sans font-bold text-xs sm:text-sm text-[#8A4B32]">
+                  Lokasi Acara
+                </h5>
+                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed px-2">
+                  Villa Nusa Permai blok L 2/1 Dapur Dahar Desa Sukamulya Kecamatan Cugenang Cianjur
+                </p>
+              </div>
+
+              {/* Google Maps Button */}
+              <a 
+                href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
+                target="_blank" 
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs sm:text-sm font-medium px-6 py-2 rounded-full shadow-md active:scale-95 transition-all"
+              >
+                <span>📍</span>
+                <span>Google Maps</span>
+              </a>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ===================================================================== */}
+        {/* SECTION 6 - LOVE STORY (Matching Referensi Gambar 2) */}
+        {/* ===================================================================== */}
+        <section 
+          id="story-section"
+          className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
+        >
+          {/* Background Texture */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
+            style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
+          />
+
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+          </div>
+          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+          </div>
+          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto">
+            {/* Title */}
+            <motion.h3 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold text-center mb-8"
+            >
+              Love Story
+            </motion.h3>
+
+            {/* Timeline Container */}
+            <div className="relative pl-6 sm:pl-8 space-y-6">
+              {/* Vertical Timeline Guide Line */}
+              <div className="absolute left-[13px] sm:left-[17px] top-3 bottom-5 w-[2px] bg-[#8A4B32]/35" />
+
+              {/* Story 1: Awal Kisah */}
+              <motion.div 
+                initial={{ opacity: 0, x: 25 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.65, ease: "easeOut" }}
+                className="relative"
+              >
+                {/* Node with heart */}
+                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
+                  ♥
+                </div>
+
+                {/* Speech Bubble Card */}
+                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
+                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
+                    &quot; awal kisah &quot;
+                  </h4>
+                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
+                    Tanpa sengaja semesta mempertemukan kami lewat dunia maya. Dari obrolan ringan di sosial media instagram, kami pertama bertemu pada tanggal 05 Maret 2024, tidak ada yang pernah menyangka bahwa dari pertemuan itu tumbuh rasa hangat hingga hati kami sepakat untuk saling menjaga. Perjalanan kami bukan hanya tentang kebahagiaan, tapi tentang proses saling mendewasakan. Kami belajar menyatukan perbedaan, membangun fondasi kepercayaan, dan meyakini bahwa setiap tantangan adalah cara kami untuk semakin kokoh sebagai satu kesatuan.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Story 2: Lamaran */}
+              <motion.div 
+                initial={{ opacity: 0, x: 25 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.65, delay: 0.1, ease: "easeOut" }}
+                className="relative"
+              >
+                {/* Node with heart */}
+                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
+                  ♥
+                </div>
+
+                {/* Speech Bubble Card */}
+                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
+                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
+                    &quot; lamaran &quot;
+                  </h4>
+                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
+                    Kehendak-Nya menuntun kami pada sebuah ikatan suci yang di cintai-Nya. Di titik ini, kami memilih untuk berhenti mencari. Momen lamaran berlangsung pada tanggal 29 Maret 2026 menjadi bukti nyata dari kesungguhan hati-sebuah pernyataan bahwa kami siap melangkah lebih jauh.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Story 3: Awal Selamanya */}
+              <motion.div 
+                initial={{ opacity: 0, x: 25 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.65, delay: 0.2, ease: "easeOut" }}
+                className="relative"
+              >
+                {/* Node with heart */}
+                <div className="absolute -left-[25px] sm:-left-[29px] top-3 w-6 h-6 rounded-full bg-[#8A4B32] flex items-center justify-center text-white text-[10px] shadow-md border-2 border-[#f5ede2] z-10">
+                  ♥
+                </div>
+
+                {/* Speech Bubble Card */}
+                <div className="relative bg-white rounded-2xl p-5 shadow-lg border border-[#8A4B32]/10 before:content-[''] before:absolute before:-left-2 before:top-4 before:w-0 before:h-0 before:border-y-8 before:border-y-transparent before:border-r-8 before:border-r-white">
+                  <h4 className="font-sr-sans font-bold text-sm text-[#8A4B32] mb-2.5">
+                    &quot; awal selamanya &quot;
+                  </h4>
+                  <p className="font-sr-sans text-[11px] sm:text-xs text-[#5C4A40] leading-relaxed text-justify">
+                    Hari ini, dua doa menyatu menjadi satu tujuan. Di hadapan sang pencipta, kami mengukir janji suci untuk memulai hidup baru. Pernikahan ini bukanlah akhir, melainkan gerbang menuju petualangan abadi yang kami tempuh bersama.
+                  </p>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        {/* ===================================================================== */}
+        {/* SECTION 7 - OUR MOMENTS / GALLERY (Matching Referensi Gambar 3 Atas) */}
+        {/* ===================================================================== */}
+        <section 
+          id="gallery-section"
+          className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
+        >
+          {/* Background Texture */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
+            style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
+          />
+
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+          </div>
+          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+          </div>
+          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto">
+            {/* Title */}
+            <motion.h3 
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold text-center mb-6"
+            >
+              Our Moments
+            </motion.h3>
+
+            {/* Main Interactive Photo Display */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.92 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="relative bg-[#8A4B32] rounded-3xl p-2.5 sm:p-3 shadow-2xl overflow-hidden border border-white/30"
+            >
+              <div className="relative aspect-[4/5] w-full rounded-2xl overflow-hidden bg-black/20 group">
+                <img 
+                  src={galleryImages[activePhotoIdx]} 
+                  alt={`Moment ${activePhotoIdx + 1}`} 
+                  className="w-full h-full object-cover transition-all duration-500" 
+                />
+
+                {/* Fullscreen Button */}
+                <button
+                  type="button"
+                  onClick={() => setIsLightboxOpen(true)}
+                  className="absolute top-3 left-3 w-8 h-8 rounded-lg bg-black/40 hover:bg-black/60 text-white flex items-center justify-center text-sm backdrop-blur-sm transition-all"
+                  title="Perbesar Foto"
+                >
+                  ⛶
+                </button>
+
+                {/* Nav Arrows */}
+                <button
+                  type="button"
+                  onClick={() => setActivePhotoIdx((prev) => (prev === 0 ? galleryImages.length - 1 : prev - 1))}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center text-lg transition-all"
+                >
+                  ‹
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActivePhotoIdx((prev) => (prev === galleryImages.length - 1 ? 0 : prev + 1))}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/30 hover:bg-black/60 text-white flex items-center justify-center text-lg transition-all"
+                >
+                  ›
+                </button>
+              </div>
+
+              {/* Thumbnails Row */}
+              <div className="flex gap-2 pt-2.5 overflow-x-auto scrollbar-none px-0.5">
+                {galleryImages.map((imgUrl, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActivePhotoIdx(idx)}
+                    className={`relative w-12 h-12 shrink-0 rounded-lg overflow-hidden border-2 transition-all cursor-pointer ${
+                      activePhotoIdx === idx ? "border-white scale-105 shadow-md" : "border-transparent opacity-60 hover:opacity-100"
+                    }`}
+                  >
+                    <img src={imgUrl} alt={`Thumb ${idx + 1}`} className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* Lightbox Modal */}
+        <AnimatePresence>
+          {isLightboxOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsLightboxOpen(false)}
+              className="fixed inset-0 z-[100] bg-black/90 flex items-center justify-center p-4 backdrop-blur-md cursor-pointer select-none"
+            >
+              <button 
+                type="button" 
+                onClick={() => setIsLightboxOpen(false)}
+                className="absolute top-5 right-5 text-white text-3xl font-light hover:text-gray-300"
+              >
+                ✕
+              </button>
+              <img 
+                src={galleryImages[activePhotoIdx]} 
+                alt="Enlarged moment" 
+                className="max-w-full max-h-[85vh] object-contain rounded-xl shadow-2xl" 
+              />
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* ===================================================================== */}
+        {/* SECTION 8 - WEDDING GIFT / AMPLOP DIGITAL (Matching Referensi Gambar 3 Bawah) */}
+        {/* ===================================================================== */}
+        <section 
+          id="gift-section"
+          className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#8A4B32] text-white"
+        >
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain opacity-95" />
+          </div>
+          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180 opacity-95" />
+          </div>
+          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain opacity-95" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto text-center space-y-6">
+            {/* Title & Subtitle */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="space-y-2.5"
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl font-medium text-white">
+                Wedding Gift
+              </h3>
+              <p className="font-sr-sans text-xs text-white/90 leading-relaxed px-4">
+                Doa Restu Anda merupakan karunia yang sangat berarti bagi kami. Dan jika memberi adalah ungkapan tanda kasih, Anda dapat memberi melalui dibawah ini.
+              </p>
+            </motion.div>
+
+            {/* ATM Debit Card Matching Reference */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92, y: 25 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="relative rounded-3xl p-6 sm:p-7 text-left shadow-2xl overflow-hidden border border-white/40 bg-[#f5ede2] text-[#3C2A21] max-w-xs mx-auto"
+              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
+            >
+              {/* Card Top Row: BCA Logo & EMV Chip */}
+              <div className="flex items-center justify-between mb-6">
+                {/* BCA Badge */}
+                <div className="bg-white rounded-lg px-2.5 py-1 shadow-sm border border-[#8A4B32]/10 flex items-center gap-1">
+                  <div className="w-4 h-4 rounded-full bg-[#00529C] flex items-center justify-center text-[9px] text-white font-bold">
+                    B
+                  </div>
+                  <span className="font-sans font-extrabold text-sm tracking-wider text-[#00529C]">BCA</span>
+                </div>
+
+                {/* EMV Gold Chip Icon */}
+                <div className="w-10 h-8 rounded-md bg-gradient-to-tr from-amber-400 via-yellow-300 to-amber-500 border border-amber-600/50 shadow-inner flex flex-col justify-around p-1">
+                  <div className="w-full h-[1px] bg-amber-700/40" />
+                  <div className="w-full h-[1px] bg-amber-700/40" />
+                </div>
+              </div>
+
+              {/* No Rekening */}
+              <div className="space-y-0.5 mb-4">
+                <span className="font-sr-sans text-[11px] font-semibold text-[#6E5D53]">
+                  No Rekening
+                </span>
+                <p className="font-sr-sans text-xl sm:text-2xl font-bold tracking-wider text-[#3C2A21] font-mono">
+                  3480994875
+                </p>
+              </div>
+
+              {/* Atas Nama & Copy Button */}
+              <div className="flex items-end justify-between pt-1">
+                <div>
+                  <span className="font-sr-sans text-[11px] font-semibold text-[#6E5D53]">
+                    Atas Nama
+                  </span>
+                  <p className="font-sr-sans text-sm font-bold italic text-[#3C2A21]">
+                    Sopiah
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => copyAccountNumber("3480994875")}
+                  className="inline-flex items-center gap-1.5 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs px-4 py-1.5 rounded-full shadow-md active:scale-95 transition-all cursor-pointer"
+                >
+                  <span>📋</span>
+                  <span>{copiedBank ? "Tersalin!" : "Salin"}</span>
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ===================================================================== */}
+        {/* SECTION 9 - UCAPAN & RSVP (Matching Referensi Gambar 4) */}
+        {/* ===================================================================== */}
+        <section 
+          id="rsvp-section"
+          className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
+        >
+          {/* Background Texture */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
+            style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
+          />
+
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+          </div>
+          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain rotate-180" />
+          </div>
+          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-03.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto space-y-6">
+            {/* Header */}
+            <motion.div
+              initial={{ opacity: 0, y: -20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.6, ease: "easeOut" }}
+              className="text-center space-y-1.5"
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
+                Ucapan &amp; RSVP
+              </h3>
+              <p className="font-sr-sans text-xs text-[#5C4A40]">
+                Berikan doa dan ucapan terbaik untuk kami.
+              </p>
+            </motion.div>
+
+            {/* RSVP Form Card */}
+            <motion.div
+              initial={{ opacity: 0, y: 25 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="relative rounded-3xl p-5 sm:p-6 bg-white/70 backdrop-blur-sm border border-[#8A4B32]/25 shadow-xl space-y-4"
+            >
+              <form onSubmit={handleSubmitRsvp} className="space-y-3.5">
+                <div>
+                  <input 
+                    type="text"
+                    required
+                    value={rsvpName}
+                    onChange={(e) => setRsvpName(e.target.value)}
+                    placeholder="nama" 
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8A4B32]/30 bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/50 focus:outline-none focus:border-[#8A4B32] shadow-inner"
+                  />
+                </div>
+
+                <div>
+                  <textarea 
+                    required
+                    rows={3}
+                    value={rsvpMessage}
+                    onChange={(e) => setRsvpMessage(e.target.value)}
+                    placeholder="Ucapan" 
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#8A4B32]/30 bg-white text-xs sm:text-sm text-[#3C2A21] placeholder-[#8A4B32]/50 focus:outline-none focus:border-[#8A4B32] shadow-inner resize-none"
+                  />
+                </div>
+
+                {/* Divider Line */}
+                <div className="flex items-center gap-2 pt-1 pb-0.5">
+                  <div className="flex-1 h-[1px] bg-[#8A4B32]/25" />
+                  <span className="font-sr-sans text-[11px] font-semibold text-[#8A4B32] whitespace-nowrap">
+                    Konfirmasi Kehadiran
+                  </span>
+                  <div className="flex-1 h-[1px] bg-[#8A4B32]/25" />
+                </div>
+
+                {/* Attendance Toggle */}
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setRsvpStatus("hadir")}
+                    className={`py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      rsvpStatus === "hadir"
+                        ? "bg-[#8A4B32] text-white shadow-md"
+                        : "bg-[#e5d8cb] text-[#5C4A40] hover:bg-[#d8c8b8]"
+                    }`}
+                  >
+                    <span>✔</span>
+                    <span>Hadir</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setRsvpStatus("tidak_hadir")}
+                    className={`py-2 px-3 rounded-full text-xs font-semibold flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
+                      rsvpStatus === "tidak_hadir"
+                        ? "bg-[#8A4B32] text-white shadow-md"
+                        : "bg-[#e5d8cb] text-[#5C4A40] hover:bg-[#d8c8b8]"
+                    }`}
+                  >
+                    <span>✖</span>
+                    <span>Tidak Hadir</span>
+                  </button>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={isSubmittingRsvp}
+                  className="w-full py-2.5 rounded-full bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-semibold text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer mt-2 disabled:opacity-70"
+                >
+                  {isSubmittingRsvp ? "Mengirim..." : "Kirim"}
+                </button>
+
+                {rsvpSuccessMsg && (
+                  <p className="text-center font-sr-sans text-xs text-green-700 font-semibold pt-1">
+                    ✓ Terima kasih! Ucapan Anda berhasil terkirim.
+                  </p>
+                )}
+              </form>
+
+              {/* Wishes List Container */}
+              <div className="pt-3 space-y-3 max-h-72 overflow-y-auto pr-1">
+                {wishesList.map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="flex items-start gap-2.5"
+                  >
+                    {/* Circle Avatar with Initials */}
+                    <div className={`w-8 h-8 rounded-full ${item.color} text-white flex items-center justify-center text-[11px] font-bold shrink-0 shadow-sm`}>
+                      {item.initial}
+                    </div>
+
+                    {/* Speech Box */}
+                    <div className="flex-1 bg-white rounded-xl p-3 shadow-sm border border-[#8A4B32]/10 space-y-0.5">
+                      <h5 className="font-sr-sans font-bold text-xs text-[#8A4B32]">
+                        {item.name}
+                      </h5>
+                      <p className="font-sr-sans text-[11px] text-[#5C4A40] leading-relaxed">
+                        {item.message}
+                      </p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          </div>
+        </section>
+
+        {/* ===================================================================== */}
+        {/* SECTION 10 - TERIMA KASIH & FOOTER (Matching Referensi Gambar 5) */}
+        {/* ===================================================================== */}
+        <section 
+          id="closing-section"
+          className="relative w-full pt-14 pb-0 overflow-hidden select-none bg-[#f5ede2]"
+        >
+          {/* Background Texture */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
+            style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
+          />
+
+          {/* Floral Corners */}
+          <div className="absolute top-0 left-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-02.png" alt="Floral" className="w-32 sm:w-40 h-auto object-contain" />
+          </div>
+          <div className="absolute top-0 right-0 pointer-events-none z-10">
+            <img src="/assets/template/SR-01.png" alt="Floral" className="w-24 sm:w-32 h-auto object-contain" />
+          </div>
+
+          <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-12">
+            {/* Arch Photo Dome */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 25 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="relative mx-auto mb-6 w-[210px] sm:w-[230px] aspect-square flex items-center justify-center"
+            >
+              {/* Floral Wings Wrapper with bottom-clipping */}
+              <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
+                <img 
+                  src="/assets/template/arch-wing-left.png" 
+                  alt="Floral Wing Left" 
+                  className="absolute -left-[68px] sm:-left-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none" 
+                />
+                <img 
+                  src="/assets/template/arch-wing-right.png" 
+                  alt="Floral Wing Right" 
+                  className="absolute -right-[68px] sm:-right-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none" 
+                />
+              </div>
+
+              {/* Arch Photo Dome */}
+              <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
+                <img 
+                  src={coverPhoto} 
+                  alt={`${brideNickname} & ${groomNickname}`} 
+                  className="w-full h-full object-cover object-[center_28%]" 
+                />
+              </div>
+            </motion.div>
+
+            {/* Title & Thank You Note */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="space-y-4"
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
+                Terima Kasih
+              </h3>
+              <p className="font-sr-sans text-xs sm:text-sm text-[#5C4A40] leading-relaxed px-2">
+                Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i, berkenan hadir dan memberikan do&apos;a restu kepada kami.
+              </p>
+              <p className="font-sr-sans text-xs font-semibold text-[#3C2A21] pt-1">
+                Wassalamu&apos;alaikum warahmatullahi wabarakatuh
+              </p>
+              <div className="pt-2">
+                <span className="font-sr-sans text-xs text-[#6E5D53]">Kami Yang Berbahagia</span>
+                <h4 className="font-sr-script text-3xl sm:text-4xl text-[#8A4B32] font-semibold mt-1">
+                  {brideNickname} &amp; {groomNickname}
+                </h4>
+              </div>
+            </motion.div>
+          </div>
+
+          {/* Footer Branding Matching Reference */}
+          <footer className="relative z-20 bg-[#8A4B32] text-white pt-8 pb-24 text-center px-4">
+            <div className="max-w-xs mx-auto space-y-3">
+              {/* Brand Logo */}
+              <div className="inline-flex items-center gap-2 justify-center">
+                <div className="w-6 h-6 rounded-lg bg-[#2DD4BF] flex items-center justify-center text-white font-bold text-xs shadow-sm">
+                  i
+                </div>
+                <span className="font-sans font-semibold text-sm tracking-wide text-white">invisimple.id</span>
+              </div>
+
+              {/* Social Links */}
+              <div className="flex items-center justify-center gap-3 text-[11px] text-white/90 font-sr-sans pt-1">
+                <span className="flex items-center gap-1">📸 invisimple.id</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">💬 0851 50000 715</span>
+                <span>•</span>
+                <span className="flex items-center gap-1">🎵 invisimple.id</span>
+              </div>
+
+              <p className="font-sr-sans text-[10px] tracking-[0.25em] uppercase text-white/70 pt-2 font-medium">
+                HUBUNGI KAMI
+              </p>
+            </div>
+          </footer>
+        </section>
+
       </div>
 
       {/* ===================================================================== */}
@@ -639,10 +1459,10 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               {[
                 { id: "hero-section", icon: "🏠", label: "Home" },
                 { id: "couple-section", icon: "🤍", label: "Mempelai" },
-                { id: "hero-section", icon: "📅", label: "Tanggal" },
-                { id: "couple-section", icon: "📷", label: "Galeri" },
-                { id: "couple-section", icon: "🎁", label: "Kado" },
-                { id: "couple-section", icon: "💬", label: "Ucapan" },
+                { id: "event-section", icon: "📅", label: "Acara" },
+                { id: "gallery-section", icon: "📷", label: "Galeri" },
+                { id: "gift-section", icon: "🎁", label: "Kado" },
+                { id: "rsvp-section", icon: "💬", label: "Ucapan" },
               ].map((item, idx) => (
                 <button
                   key={idx}
