@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
-import { DbGuest, DbProject, DbEvent, DbWish, isDefaultStorageUrl } from "../../lib/resolveProject";
+import { motion, AnimatePresence } from "framer-motion";
+import { DbGuest, DbProject, DbEvent, DbWish } from "../../lib/resolveProject";
 
 interface Props {
   guestName: string;
@@ -19,26 +19,27 @@ interface Props {
 
 export default function RightSidebar({ guestName, guest, project, events, wishes: initialWishes }: Props) {
   const [isOpen, setIsOpen] = useState(false);
-  const [isAnimating, setIsAnimating] = useState(false);
   const [isPlayingMusic, setIsPlayingMusic] = useState(false);
-  const [activeNav, setActiveNav] = useState("home");
+  const [activeNav, setActiveNav] = useState("hero-section");
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Couple Data with Fallbacks (Sopi & Fahri)
-  const brideNickname = project?.bride_nickname || "Sopi";
-  const groomNickname = project?.groom_nickname || "Fahri";
-  const brideFull = project?.bride_name || "Sopiah";
-  const groomFull = project?.groom_name || "Muhammad Fahri Rahman, S.Pd";
-  const brideFather = (project as any)?.bride_father || "H. Endang Rusmana/juang";
-  const brideMother = (project as any)?.bride_mother || "Hj. Dede Empid";
-  const brideIg = (project as any)?.bride_instagram ? (project as any).bride_instagram.replace("@", "") : "sopizhrt";
-  const groomFather = (project as any)?.groom_father || "H.M.Saepulloh.A.md.Kep.S.Ip";
-  const groomMother = (project as any)?.groom_mother || "Hj.Een Cahyati,S.Pd";
-  const groomIg = (project as any)?.groom_instagram ? (project as any).groom_instagram.replace("@", "") : "mfaahrirahman9";
+  // Couple Data: Mempelai Pria = Marvel, Mempelai Wanita = Nathalie
+  const brideNickname = project?.bride_nickname || "Nathalie";
+  const groomNickname = project?.groom_nickname || "Marvel";
+  const brideFull = project?.bride_name || "Nathalie";
+  const groomFull = project?.groom_name || "Marvel";
+  const brideFather = (project as any)?.bride_father || "Bpk. Orang Tua";
+  const brideMother = (project as any)?.bride_mother || "Ibu Orang Tua";
+  const brideIg = (project as any)?.bride_instagram ? (project as any).bride_instagram.replace("@", "") : "";
+  const groomFather = (project as any)?.groom_father || "Bpk. Orang Tua";
+  const groomMother = (project as any)?.groom_mother || "Ibu Orang Tua";
+  const groomIg = (project as any)?.groom_instagram ? (project as any).groom_instagram.replace("@", "") : "";
 
-  const coverPhoto = project?.cover_photo_url || project?.opening_photo_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop";
-  const bridePhoto = project?.bride_photo_url || "https://images.unsplash.com/photo-1583939003579-730e3918a45a?q=80&w=800&auto=format&fit=crop";
-  const groomPhoto = project?.groom_photo_url || "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?q=80&w=800&auto=format&fit=crop";
+  // Exact couple photo matching Gambar 1 reference
+  const coverPhoto = project?.cover_photo_url || project?.opening_photo_url || "/assets/template/couple-cover.jpg";
+  const bridePhoto = project?.bride_photo_url || "/assets/template/couple-cover.jpg";
+  const groomPhoto = project?.groom_photo_url || "/assets/template/couple-cover.jpg";
 
   // Event Info
   const mainEvent = events && events.length > 0 ? events[0] : null;
@@ -79,23 +80,19 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const formattedDate = formatDateDisplay(weddingDateRaw);
 
   const handleOpenInvitation = () => {
-    if (isAnimating) return;
-    setIsAnimating(true);
+    setIsOpen(true);
     setIsPlayingMusic(true);
     if (audioRef.current) {
       audioRef.current.play().catch(() => {});
     }
-    // Wait for cover exit animation to complete, then show content
+
+    // Smooth scroll down so screen glides up from bottom to top, welcoming Section 2
     setTimeout(() => {
-      setIsOpen(true);
-      setIsAnimating(false);
-      setTimeout(() => {
-        const heroEl = document.getElementById("hero-section");
-        if (heroEl) {
-          heroEl.scrollIntoView({ behavior: "smooth" });
-        }
-      }, 200);
-    }, 900);
+      const heroEl = document.getElementById("hero-section");
+      if (heroEl) {
+        heroEl.scrollIntoView({ behavior: "smooth" });
+      }
+    }, 60);
   };
 
   const toggleMusic = () => {
@@ -119,7 +116,12 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   };
 
   return (
-    <div className="w-full md:w-[38%] lg:w-[35%] xl:w-[32%] min-h-[100dvh] md:h-[100dvh] md:overflow-y-auto md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl shrink-0">
+    <div 
+      ref={containerRef}
+      className={`w-full md:w-[38%] lg:w-[35%] xl:w-[32%] min-h-[100dvh] md:h-[100dvh] ${
+        isOpen ? "md:overflow-y-auto" : "overflow-hidden"
+      } md:overflow-x-hidden relative bg-[#f5ede2] text-[#3C2A21] shadow-2xl shrink-0 scroll-smooth`}
+    >
       {/* Background Audio Player */}
       <audio 
         ref={audioRef} 
@@ -130,134 +132,122 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
       {/* ========================================================================= */}
       {/* SECTION 1 - COVER MOBILE / OPENING SCREEN */}
-      {/* Photo background + parchment overlay like Gambar 1 */}
+      {/* Seamless alpha mask gradient fading directly into SR-bg.jpg */}
       {/* ========================================================================= */}
-      <AnimatePresence mode="wait">
-        {!isOpen && (
-          <motion.section
-            key="cover"
-            initial={{ opacity: 1, y: 0 }}
-            animate={isAnimating ? { opacity: 0, y: -80, scale: 1.02 } : { opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.75, ease: [0.4, 0, 0.2, 1] }}
-            className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]"
-          >
-          
-          {/* Base parchment background texture */}
-          <div 
-            className="absolute inset-0 bg-cover bg-center pointer-events-none"
-            style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
-          />
+      <section 
+        id="cover-section"
+        className="relative min-h-[100dvh] w-full flex flex-col justify-end items-center text-center px-6 pb-8 pt-0 overflow-hidden select-none bg-[#f5ede2]"
+      >
+        {/* Base parchment background texture */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center pointer-events-none"
+          style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
+        />
 
-          {/* User prewedding photo (Seamless alpha mask gradient fading directly into SR-bg.jpg, revealing castle & parchment naturally) */}
-          <div 
-            className="absolute top-0 inset-x-0 h-[66%] pointer-events-none z-0 overflow-hidden"
-            style={{
-              maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)',
-              WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)'
-            }}
-          >
+        {/* User prewedding couple photo with exact alpha mask blend */}
+        <div 
+          className="absolute top-0 inset-x-0 h-[66%] pointer-events-none z-0 overflow-hidden"
+          style={{
+            maskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)",
+            WebkitMaskImage: "linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)"
+          }}
+        >
+          <img 
+            src={coverPhoto} 
+            alt={`${brideNickname} & ${groomNickname}`} 
+            className="w-full h-full object-cover object-top"
+          />
+        </div>
+
+        {/* Animated Floral Corners at Bottom */}
+        <div className="absolute bottom-0 left-0 pointer-events-none z-10">
+          <div className="animate-sr-pulse-alt origin-bottom-left">
             <img 
-              src={coverPhoto} 
-              alt={`${brideNickname} & ${groomNickname}`} 
-              className="w-full h-full object-cover object-top"
+              src="/assets/template/SR-01.png" 
+              alt="Floral decoration" 
+              className="w-32 sm:w-36 md:w-40 h-auto object-contain select-none rotate-180" 
             />
           </div>
-
-          {/* Animated Floral Corners at Bottom - Large and prominent like Gambar 2 */}
-          <div className="absolute bottom-0 left-0 pointer-events-none z-10">
-            <div className="animate-sr-pulse-alt origin-bottom-left">
-              <img 
-                src="/assets/template/SR-01.png" 
-                alt="Floral decoration" 
-                className="w-32 sm:w-36 md:w-40 h-auto object-contain select-none rotate-180" 
-              />
-            </div>
+        </div>
+        <div className="absolute bottom-0 right-0 pointer-events-none z-10">
+          <div className="animate-sr-pulse origin-bottom-right">
+            <img 
+              src="/assets/template/SR-03.png" 
+              alt="Floral decoration" 
+              className="w-36 sm:w-40 md:w-44 h-auto object-contain select-none" 
+            />
           </div>
-          <div className="absolute bottom-0 right-0 pointer-events-none z-10">
-            <div className="animate-sr-pulse origin-bottom-right">
-              <img 
-                src="/assets/template/SR-03.png" 
-                alt="Floral decoration" 
-                className="w-36 sm:w-40 md:w-44 h-auto object-contain select-none" 
-              />
-            </div>
-          </div>
+        </div>
 
-          {/* Spacer to push content down onto the parchment */}
-          <div className="relative z-10 flex-1 min-h-[44vh]" />
+        {/* Spacer to push content down onto the parchment */}
+        <div className="relative z-10 flex-1 min-h-[44vh]" />
 
-          {/* Center Info */}
-          <motion.div 
-              className="relative z-20 w-full max-w-xs space-y-2.5 pt-1"
-              animate={isAnimating ? { opacity: 0, y: -30 } : { opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, ease: "easeInOut" }}
-            >
-            <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
-              THE WEDDING OF
+        {/* Center Info on Cover */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-20 w-full max-w-xs space-y-2.5 pt-1"
+        >
+          <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
+            THE WEDDING OF
+          </p>
+
+          <h1 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight drop-shadow-sm font-medium">
+            {brideNickname} &amp; {groomNickname}
+          </h1>
+
+          <div className="pt-1.5 pb-0.5 space-y-0.5">
+            <p className="font-sr-sans text-[11px] text-[#6E5D53]">
+              Kepada Yth.
             </p>
+            <p className="font-sr-sans text-[11px] text-[#6E5D53]">
+              Bapak/Ibu/Saudara/i
+            </p>
+            <p className="font-sr-sans text-base sm:text-lg font-bold text-[#3C2A21] pt-0.5 tracking-wide">
+              {guestName}
+            </p>
+            <p className="font-sr-sans text-[9px] italic text-[#7A6A60] px-4">
+              *Mohon maaf jika ada kesalahan dalam penulisan nama / gelar.
+            </p>
+          </div>
 
-            <h1 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight drop-shadow-sm font-medium">
-              {brideNickname} &amp; {groomNickname}
-            </h1>
+          {/* Buka Undangan Button */}
+          <div className="pt-2 flex justify-center">
+            <button
+              type="button"
+              onClick={handleOpenInvitation}
+              className="group relative inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] active:scale-95 text-white font-sr-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 cursor-pointer"
+            >
+              <span>📖</span>
+              <span>Buka Undangan</span>
+            </button>
+          </div>
+        </motion.div>
 
-            <div className="pt-1.5 pb-0.5 space-y-0.5">
-              <p className="font-sr-sans text-[11px] text-[#6E5D53]">
-                Kepada Yth.
-              </p>
-              <p className="font-sr-sans text-[11px] text-[#6E5D53]">
-                Bapak/Ibu/Saudara/i
-              </p>
-              <p className="font-sr-sans text-base sm:text-lg font-bold text-[#3C2A21] pt-0.5 tracking-wide">
-                {guestName}
-              </p>
-              <p className="font-sr-sans text-[9px] italic text-[#7A6A60] px-4">
-                *Mohon maaf jika ada kesalahan dalam penulisan nama / gelar.
-              </p>
-            </div>
-
-            {/* Buka Undangan Button */}
-            <div className="pt-2 flex justify-center">
-              <button
-                type="button"
-                onClick={handleOpenInvitation}
-                disabled={isAnimating}
-                className="group relative inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] active:scale-95 text-white font-sr-sans font-semibold text-xs sm:text-sm px-6 py-2.5 rounded-full shadow-lg transition-all duration-300 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-              >
-                <span>📖</span>
-                <span>Buka Undangan</span>
-              </button>
-            </div>
-          </motion.div>
-
-            <div className="h-4" />
-          </motion.section>
-        )}
-      </AnimatePresence>
+        <div className="h-4" />
+      </section>
 
       {/* ========================================================================= */}
-      {/* INVITATION CONTENT (AFTER BUKA UNDANGAN) */}
+      {/* INVITATION CONTENT (Disambut dengan animasi & setiap naik-turun aktif) */}
       {/* ========================================================================= */}
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            key="invitation-content"
-            initial={{ opacity: 0, y: 60 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 }}
-            className="relative pb-24"
-          >
+      {isOpen && (
+        <div className="relative pb-24">
           
           {/* ===================================================================== */}
-          {/* GAMBAR KE-3: SECTION 2 - HERO & COUNTDOWN */}
+          {/* SECTION 2 - HERO & COUNTDOWN (Sama persis Gambar 1: Bunga belakang arch) */}
           {/* ===================================================================== */}
-          <section id="hero-section" className="relative min-h-[100dvh] w-full flex flex-col items-center justify-between text-center px-6 py-12 overflow-hidden select-none bg-[#f5ede2]">
+          <section 
+            id="hero-section" 
+            className="relative min-h-[100dvh] w-full flex flex-col items-center justify-between text-center px-6 py-10 overflow-hidden select-none bg-[#f5ede2]"
+          >
             {/* Background Texture */}
             <div 
               className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
-              style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
+              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
             />
 
-            {/* Animated Floral Corners - Section 2 (Enlarged and framing the arch photo like reference) */}
+            {/* 4 Animated Floral Corners */}
             <div className="absolute top-0 left-0 pointer-events-none z-10">
               <div className="animate-sr-pulse origin-top-left">
                 <img 
@@ -295,32 +285,79 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               </div>
             </div>
 
-            <div className="relative z-20 w-full max-w-xs space-y-4 pt-4">
-              <p className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80">
+            {/* Content Container with Re-triggerable On-Scroll Animations */}
+            <div className="relative z-20 w-full max-w-xs space-y-3 pt-2">
+              
+              {/* Heading Text */}
+              <motion.p 
+                initial={{ opacity: 0, y: -15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.6, ease: "easeOut" }}
+                className="font-sr-sans text-[11px] font-semibold tracking-[0.3em] uppercase text-[#3C2A21]/80"
+              >
                 THE WEDDING OF
-              </p>
+              </motion.p>
 
-              {/* Arch Photo with Couple */}
-              <div className="relative mx-auto w-48 aspect-[3/4] rounded-t-full overflow-hidden shadow-2xl border-4 border-white/80">
-                <img 
-                  src={coverPhoto} 
-                  alt={`${brideNickname} & ${groomNickname}`} 
-                  className="w-full h-full object-cover"
-                />
-              </div>
+              {/* Arch Photo Frame with Floral Wings Behind it (Exact match Gambar 1) */}
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 25 }}
+                whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.25 }}
+                transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="relative mx-auto my-2 w-[225px] sm:w-[250px] aspect-square flex items-center justify-center select-none"
+              >
+                {/* Floral Wing Left - tucked behind arch */}
+                <div className="absolute -left-9 sm:-left-11 bottom-0 w-28 sm:w-32 h-auto pointer-events-none z-10 select-none">
+                  <img 
+                    src="/assets/template/SR-01.png" 
+                    alt="Floral Wing Left" 
+                    className="w-full h-auto object-contain -scale-y-100 -scale-x-100" 
+                  />
+                </div>
+
+                {/* Floral Wing Right - tucked behind arch */}
+                <div className="absolute -right-9 sm:-right-11 bottom-0 w-28 sm:w-32 h-auto pointer-events-none z-10 select-none">
+                  <img 
+                    src="/assets/template/SR-01.png" 
+                    alt="Floral Wing Right" 
+                    className="w-full h-auto object-contain -scale-y-100" 
+                  />
+                </div>
+
+                {/* Arch Photo Dome */}
+                <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
+                  <img 
+                    src={coverPhoto} 
+                    alt={`${brideNickname} & ${groomNickname}`} 
+                    className="w-full h-full object-cover object-[center_28%]" 
+                  />
+                </div>
+              </motion.div>
 
               {/* Couple Title & Date */}
-              <div>
-                <h2 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight font-medium">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, delay: 0.1, ease: "easeOut" }}
+              >
+                <h2 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] leading-tight font-medium drop-shadow-sm">
                   {brideNickname} &amp; {groomNickname}
                 </h2>
-                <p className="font-sr-sans text-xs sm:text-sm font-medium text-[#4A3B32] mt-1">
+                <p className="font-sr-sans text-xs sm:text-sm font-medium text-[#4A3B32] mt-1 tracking-wide">
                   {formattedDate}
                 </p>
-              </div>
+              </motion.div>
 
               {/* 4 Countdown Boxes */}
-              <div className="grid grid-cols-4 gap-2 pt-2 px-2">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, delay: 0.2, ease: "easeOut" }}
+                className="grid grid-cols-4 gap-2 pt-1 px-1 w-full max-w-[280px] mx-auto"
+              >
                 {[
                   { label: "Hari", val: timeLeft.days },
                   { label: "Jam", val: timeLeft.hours },
@@ -339,34 +376,45 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                     </span>
                   </div>
                 ))}
-              </div>
+              </motion.div>
 
-              {/* Simpan Tanggal Button */}
-              <div className="pt-2 flex justify-center">
+              {/* Simpan Tanggal Button & Down Arrow */}
+              <motion.div
+                initial={{ opacity: 0, y: 15 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: false, amount: 0.2 }}
+                transition={{ duration: 0.7, delay: 0.3, ease: "easeOut" }}
+                className="pt-1 flex flex-col items-center gap-2.5"
+              >
                 <a 
                   href={`https://calendar.google.com/calendar/render?action=TEMPLATE&text=The+Wedding+of+${encodeURIComponent(brideNickname)}+%26+${encodeURIComponent(groomNickname)}`}
                   target="_blank"
                   rel="noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-medium text-xs px-5 py-2 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
+                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans font-medium text-xs px-5 py-2.5 rounded-full shadow-md transition-all active:scale-95 cursor-pointer"
                 >
                   <span>📅</span>
                   <span>Simpan Tanggal</span>
                 </a>
-              </div>
 
-              {/* Bouncing Arrow Down */}
-              <div className="pt-2 flex justify-center">
-                <span className="text-[#8A4B32] text-lg animate-bounce">↓</span>
-              </div>
+                {/* Bouncing Arrow Down */}
+                <span className="text-[#8A4B32] text-lg animate-bounce pt-0.5">↓</span>
+              </motion.div>
             </div>
 
-            <div className="h-4" />
+            <div className="h-2" />
           </section>
 
           {/* ===================================================================== */}
-          {/* GAMBAR KE-4: SECTION 3 - AYAT SUCI (Q.S AR-RUM : 21) */}
+          {/* SECTION 3 - AYAT SUCI (Q.S AR-RUM : 21) */}
           {/* ===================================================================== */}
-          <section id="ayat-section" className="relative w-full px-6 py-10 overflow-hidden bg-[#8A4B32] text-white select-none shadow-md">
+          <motion.section 
+            id="ayat-section"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.25 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full px-6 py-12 overflow-hidden bg-[#8A4B32] text-white select-none shadow-md"
+          >
             <div className="max-w-md mx-auto text-center space-y-6 px-2 py-4">
               <p className="font-sr-sans text-xs sm:text-sm leading-relaxed text-white/95 italic font-light">
                 &quot;Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.&quot;
@@ -376,19 +424,26 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 Q.S Ar-Rum : 21
               </h3>
             </div>
-          </section>
+          </motion.section>
 
           {/* ===================================================================== */}
-          {/* GAMBAR KE-5: SECTION 4 - PROFIL MEMPELAI (BRIDE & GROOM) */}
+          {/* SECTION 4 - PROFIL MEMPELAI (BRIDE & GROOM) */}
           {/* ===================================================================== */}
-          <section id="couple-section" className="relative w-full px-6 py-14 overflow-hidden select-none bg-[#f5ede2]">
+          <motion.section 
+            id="couple-section"
+            initial={{ opacity: 0, y: 40 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: false, amount: 0.15 }}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="relative w-full px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
+          >
             {/* Background Texture */}
             <div 
               className="absolute inset-0 bg-cover bg-center pointer-events-none opacity-90"
-              style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
+              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)` }}
             />
 
-            {/* Floral Corners - Correct matching assets, natural flush borders, no flat cutouts */}
+            {/* Floral Corners */}
             <div className="absolute top-0 left-0 pointer-events-none z-10">
               <div className="animate-sr-pulse origin-top-left">
                 <img 
@@ -437,7 +492,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 </p>
               </div>
 
-              {/* Mempelai Wanita (Bride) */}
+              {/* Mempelai Wanita (Nathalie) */}
               <div className="space-y-3 flex flex-col items-center">
                 <div className="w-40 aspect-[3/4] rounded-t-full overflow-hidden shadow-md border-2 border-[#8A4B32]/30">
                   <img 
@@ -452,8 +507,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 </h3>
 
                 <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
-                  <p className="font-semibold text-[11px]">Putri Keempat dari</p>
-                  <p className="text-[11px] leading-tight">Bapak {brideFather} &amp; Ibu {brideMother}</p>
+                  <p className="font-semibold text-[11px]">Mempelai Wanita</p>
+                  <p className="text-[11px] leading-tight">Putri dari Bapak {brideFather} &amp; Ibu {brideMother}</p>
                 </div>
 
                 {brideIg && (
@@ -474,7 +529,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 &amp;
               </div>
 
-              {/* Mempelai Pria (Groom) */}
+              {/* Mempelai Pria (Marvel) */}
               <div className="space-y-3 flex flex-col items-center">
                 <div className="w-40 aspect-[3/4] rounded-t-full overflow-hidden shadow-md border-2 border-[#8A4B32]/30">
                   <img 
@@ -489,8 +544,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 </h3>
 
                 <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
-                  <p className="font-semibold text-[11px]">Putra Kedua dari</p>
-                  <p className="text-[11px] leading-tight">Bapak {groomFather} &amp; Ibu {groomMother}</p>
+                  <p className="font-semibold text-[11px]">Mempelai Pria</p>
+                  <p className="text-[11px] leading-tight">Putra dari Bapak {groomFather} &amp; Ibu {groomMother}</p>
                 </div>
 
                 {groomIg && (
@@ -506,7 +561,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 )}
               </div>
             </div>
-          </section>
+          </motion.section>
 
           {/* ===================================================================== */}
           {/* FLOATING CONTROLS: MUSIC & BOTTOM NAV (Pinned strictly to Right Sidebar) */}
@@ -525,23 +580,22 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </button>
           </div>
 
-          {/* Floating Bottom Navigation Bar (Centered within Right Sidebar on desktop, never spilling to left) */}
+          {/* Floating Bottom Navigation Bar (6 icons matching Gambar 1 reference) */}
           <div className="fixed bottom-4 z-50 pointer-events-none w-full md:w-[38%] lg:w-[35%] xl:w-[32%] right-0 flex justify-center px-4">
-            <nav className="pointer-events-auto bg-[#8A4B32]/90 backdrop-blur-md rounded-2xl px-3 py-2 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-2">
+            <nav className="pointer-events-auto bg-[#8A4B32]/95 backdrop-blur-md rounded-2xl px-2.5 py-1.5 shadow-2xl border border-white/20 flex items-center gap-1 sm:gap-1.5">
               {[
                 { id: "hero-section", icon: "🏠", label: "Home" },
                 { id: "couple-section", icon: "🤍", label: "Mempelai" },
-                { id: "ayat-section", icon: "📖", label: "Ayat" },
-              ].map((item) => (
+                { id: "hero-section", icon: "📅", label: "Tanggal" },
+                { id: "couple-section", icon: "📷", label: "Galeri" },
+                { id: "couple-section", icon: "🎁", label: "Kado" },
+                { id: "couple-section", icon: "💬", label: "Ucapan" },
+              ].map((item, idx) => (
                 <button
-                  key={item.id}
+                  key={idx}
                   type="button"
                   onClick={() => scrollToSection(item.id)}
-                  className={`w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-sm sm:text-base transition-all ${
-                    activeNav === item.id 
-                      ? "bg-white/25 text-white shadow-inner scale-105" 
-                      : "text-white/80 hover:text-white hover:bg-white/10"
-                  }`}
+                  className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center text-xs sm:text-sm text-white/90 hover:text-white hover:bg-white/20 transition-all active:scale-95"
                   title={item.label}
                 >
                   {item.icon}
@@ -550,9 +604,8 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </nav>
           </div>
 
-          </motion.div>
-        )}
-      </AnimatePresence>
+        </div>
+      )}
     </div>
   );
 }

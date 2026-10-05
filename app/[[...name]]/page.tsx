@@ -47,10 +47,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     guestName = formatFallbackGuestName(resolvedParams.name.join(" "));
   }
 
-  const brideName = dbData.project?.bride_nickname || "Sopi";
-  const groomName = dbData.project?.groom_nickname || "Fahri";
-  const brideFull = dbData.project?.bride_name || "Sopiah";
-  const groomFull = dbData.project?.groom_name || "Muhammad Fahri Rahman, S.Pd";
+  const brideName = dbData.project?.bride_nickname || "Nathalie";
+  const groomName = dbData.project?.groom_nickname || "Marvel";
+  const brideFull = dbData.project?.bride_name || "Nathalie";
+  const groomFull = dbData.project?.groom_name || "Marvel";
 
   const title = `Undangan Pernikahan untuk ${guestName} | ${brideName} & ${groomName}`;
   const description = `Kepada Yth. ${guestName}, kami mengundang Anda untuk hadir di pernikahan ${brideFull} & ${groomFull}.`;
@@ -120,8 +120,8 @@ export default async function Home({ params }: Props) {
     guestName = formatFallbackGuestName(resolvedParams.name.join(" "));
   }
 
-  const brideNickname = dbData.project?.bride_nickname || "Sopi";
-  const groomNickname = dbData.project?.groom_nickname || "Fahri";
+  const brideNickname = dbData.project?.bride_nickname || "Nathalie";
+  const groomNickname = dbData.project?.groom_nickname || "Marvel";
   const weddingDateRaw = dbData.events?.[0]?.event_date || dbData.project?.wedding_date || "2026-05-23";
 
   const formatDateDisplay = (dateStr?: string | null) => {
@@ -138,7 +138,7 @@ export default async function Home({ params }: Props) {
   };
 
   const formattedDate = formatDateDisplay(weddingDateRaw);
-  const coverPhoto = dbData.project?.cover_photo_url || dbData.project?.opening_photo_url || "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1200&auto=format&fit=crop";
+  const coverPhoto = dbData.project?.cover_photo_url || dbData.project?.opening_photo_url || "/assets/template/couple-cover.jpg";
 
   return (
     <main className="min-h-[100dvh] md:h-[100dvh] w-full flex flex-col md:flex-row bg-[#e8ded1] text-[#3C2A21] md:overflow-hidden relative">
