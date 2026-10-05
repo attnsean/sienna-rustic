@@ -1,0 +1,130 @@
+@import "tailwindcss";
+@import url("https://fonts.googleapis.com/css2?family=Gaegu:wght@300;400;700&display=swap");
+
+@font-face {
+  font-family: "Lovely Melody";
+  src: url("/assets/template/font/Lovely%20Melody.otf") format("opentype"),
+       url("https://www.serastory.com/storage/undangan/templates/illustrated-love-story-01/font/Lovely%20Melody.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Monarque Signature";
+  src: url("/assets/template/font/Monarque%20Signature.otf") format("opentype"),
+       url("https://www.serastory.com/storage/undangan/templates/illustrated-love-story-01/font/Monarque%20Signature.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Abside";
+  src: url("/assets/template/font/Abside-Regular.otf") format("opentype"),
+       url("https://www.serastory.com/storage/undangan/templates/illustrated-love-story-01/font/Abside-Regular.otf") format("opentype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #111111;
+}
+
+@theme inline {
+  --font-melody: "Lovely Melody", cursive, sans-serif;
+  --font-gaegu: "Gaegu", cursive, sans-serif;
+  --font-signature: "Monarque Signature", cursive, sans-serif;
+  --font-abside: "Abside", sans-serif;
+}
+
+.font-melody {
+  font-family: "Lovely Melody", cursive, sans-serif;
+}
+
+.font-gaegu {
+  font-family: "Gaegu", cursive, sans-serif;
+}
+
+.font-signature {
+  font-family: "Monarque Signature", cursive, sans-serif;
+}
+
+.font-abside {
+  font-family: "Abside", sans-serif;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: "Gaegu", cursive, sans-serif;
+  overflow-x: hidden;
+}
+
+/* Custom scrollbars */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Cute doodle bounce and wiggle */
+@keyframes wiggle {
+  0%, 100% { transform: rotate(-2deg); }
+  50% { transform: rotate(2deg); }
+}
+
+.animate-wiggle {
+  animation: wiggle 3s ease-in-out infinite;
+}
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Great+Vibes&family=Playball&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&display=swap');
+
+@keyframes rusticZoomInOut {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+
+@keyframes rusticDiscRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-sr-pulse {
+  animation: rusticZoomInOut 4.5s ease-in-out infinite;
+  transform-origin: center center;
+}
+
+.animate-sr-pulse-delay {
+  animation: rusticZoomInOut 5s ease-in-out infinite 1.5s;
+  transform-origin: center center;
+}
+
+.animate-sr-pulse-alt {
+  animation: rusticZoomInOut 4s ease-in-out infinite 0.8s;
+  transform-origin: center center;
+}
+
+.animate-sr-spin {
+  animation: rusticDiscRotate 6s linear infinite;
+}
+
+.font-sr-script {
+  font-family: 'Playball', 'Great Vibes', cursive, sans-serif !important;
+}
+
+.font-sr-serif {
+  font-family: 'Cinzel', serif !important;
+}
+
+.font-sr-sans {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
