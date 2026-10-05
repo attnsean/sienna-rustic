@@ -134,15 +134,19 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             style={{ backgroundImage: `url('/assets/template/SR-bg.jpg')` }}
           />
 
-          {/* User prewedding photo at top (100% full opacity, NO opacity overlay on photo, exactly like Gambar 2) */}
-          <div className="absolute top-0 inset-x-0 h-[56%] pointer-events-none z-0 overflow-hidden">
+          {/* User prewedding photo (Seamless alpha mask gradient fading directly into SR-bg.jpg, revealing castle & parchment naturally) */}
+          <div 
+            className="absolute top-0 inset-x-0 h-[66%] pointer-events-none z-0 overflow-hidden"
+            style={{
+              maskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)',
+              WebkitMaskImage: 'linear-gradient(to bottom, rgba(0,0,0,1) 0%, rgba(0,0,0,1) 32%, rgba(0,0,0,0.85) 42%, rgba(0,0,0,0.35) 56%, rgba(0,0,0,0) 72%)'
+            }}
+          >
             <img 
               src={coverPhoto} 
               alt={`${brideNickname} & ${groomNickname}`} 
               className="w-full h-full object-cover object-top"
             />
-            {/* Smooth bottom gradient blend into parchment */}
-            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#f5ede2] via-[#f5ede2]/80 to-transparent" />
           </div>
 
           {/* Animated Floral Corners at Bottom - Large and prominent like Gambar 2 */}
