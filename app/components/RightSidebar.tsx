@@ -1370,7 +1370,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         {/* ===================================================================== */}
         <section 
           id="closing-section"
-          className="relative w-full pt-16 pb-0 overflow-hidden select-none bg-[#f5ede2]"
+          className="relative w-full pt-14 pb-0 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
           <div 
@@ -1390,154 +1390,162 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
 
-          <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-14">
-            
-            {/* Main Aesthetic Card Container */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.2 }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className="relative rounded-[2rem] p-6 sm:p-8 bg-white/70 backdrop-blur-md border border-[#8A4B32]/20 shadow-2xl space-y-6"
+          <div className="relative z-20 max-w-sm mx-auto px-5 sm:px-6 text-center pb-12">
+            {/* Arch Photo Dome */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 25 }}
+              whileInView={{ opacity: 1, scale: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.25 }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="relative mx-auto mb-6 w-[210px] sm:w-[230px] aspect-square flex items-center justify-center"
             >
-              {/* Arch Photo Dome with Animated Floral Wings */}
-              <div className="relative mx-auto w-[205px] sm:w-[225px] aspect-square flex items-center justify-center">
-                {/* Floral Wings with bottom-clipping */}
-                <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
-                  <motion.img 
-                    src="/assets/template/arch-wing-left.png" 
-                    alt="Floral Wing Left" 
-                    className="absolute -left-[68px] sm:-left-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-right" 
-                    animate={{
-                      rotate: [-1.2, 1.5, -1.2],
-                      y: [0, -3.5, 0],
-                      x: [0, -1.5, 0],
-                    }}
-                    transition={{
-                      duration: 5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  />
-                  <motion.img 
-                    src="/assets/template/arch-wing-right.png" 
-                    alt="Floral Wing Right" 
-                    className="absolute -right-[68px] sm:-right-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none select-none origin-bottom-left" 
-                    animate={{
-                      rotate: [1.5, -1.2, 1.5],
-                      y: [0, -3.5, 0],
-                      x: [0, 1.5, 0],
-                    }}
-                    transition={{
-                      duration: 5.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                      delay: 0.6,
-                    }}
-                  />
-                </div>
-
-                {/* Arch Photo Dome */}
-                <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
-                  <img 
-                    src={coverPhoto} 
-                    alt={`${brideNickname} & ${groomNickname}`} 
-                    className="w-full h-full object-cover object-top" 
-                  />
-                </div>
+              {/* Floral Wings Wrapper with bottom-clipping */}
+              <div className="absolute inset-0 pointer-events-none z-10 [clip-path:inset(-250px_-250px_0px_-250px)]">
+                <motion.img 
+                  src="/assets/template/arch-wing-left.png" 
+                  alt="Floral Wing Left" 
+                  className="absolute -left-[68px] sm:-left-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none origin-bottom-right" 
+                  animate={{
+                    rotate: [-1.2, 1.5, -1.2],
+                    y: [0, -3.5, 0],
+                    x: [0, -1.5, 0],
+                  }}
+                  transition={{
+                    duration: 5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                />
+                <motion.img 
+                  src="/assets/template/arch-wing-right.png" 
+                  alt="Floral Wing Right" 
+                  className="absolute -right-[68px] sm:-right-[76px] bottom-0 h-[105%] w-auto object-contain pointer-events-none origin-bottom-left" 
+                  animate={{
+                    rotate: [1.5, -1.2, 1.5],
+                    y: [0, -3.5, 0],
+                    x: [0, 1.5, 0],
+                  }}
+                  transition={{
+                    duration: 5.5,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                    delay: 0.6,
+                  }}
+                />
               </div>
 
-              {/* Title & Ornamental Flourish */}
-              <div className="space-y-2">
-                <h3 className="font-sr-script text-5xl sm:text-6xl text-[#8A4B32] font-semibold drop-shadow-sm">
-                  Terima Kasih
-                </h3>
-                <div className="flex items-center justify-center gap-2 text-[#8A4B32]/40 text-xs">
-                  <span className="w-8 h-[1px] bg-[#8A4B32]/30" />
-                  <span>✦ ✦ ✦</span>
-                  <span className="w-8 h-[1px] bg-[#8A4B32]/30" />
-                </div>
+              {/* Arch Photo Dome */}
+              <div className="relative z-20 w-full h-full rounded-t-full rounded-b-none overflow-hidden shadow-2xl border-[3.5px] border-white bg-[#e0d6c7]">
+                <img 
+                  src={coverPhoto} 
+                  alt={`${brideNickname} & ${groomNickname}`} 
+                  className="w-full h-full object-cover object-top" 
+                />
               </div>
+            </motion.div>
 
-              {/* Gratitude Message */}
-              <p className="font-sr-sans text-xs sm:text-[13px] text-[#5C4A40] leading-relaxed italic font-light px-1">
-                &quot;Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan do&apos;a restu kepada kami.&quot;
+            {/* Title & Thank You Note */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: false, amount: 0.3 }}
+              transition={{ duration: 0.65, ease: "easeOut" }}
+              className="space-y-4"
+            >
+              <h3 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
+                Terima Kasih
+              </h3>
+              <p className="font-sr-sans text-xs sm:text-sm text-[#5C4A40] leading-relaxed px-2">
+                Merupakan suatu kebahagiaan dan kehormatan bagi kami, apabila Bapak/Ibu/Saudara/i, berkenan hadir dan memberikan do&apos;a restu kepada kami.
               </p>
-
-              {/* Salam Penutup */}
-              <div className="pt-1 border-t border-[#8A4B32]/15">
-                <p className="font-sr-sans text-[11px] font-bold tracking-wider uppercase text-[#3C2A21] pt-3">
-                  Wassalamu&apos;alaikum Warahmatullahi Wabarakatuh
-                </p>
-              </div>
-
-              {/* Sign-off & Couple Names */}
-              <div className="pt-2 space-y-1">
-                <span className="font-sr-sans text-[11px] font-medium tracking-wide text-[#7C6A60] uppercase">
-                  Kami Yang Berbahagia
-                </span>
-                <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold drop-shadow-sm">
+              <p className="font-sr-sans text-xs font-semibold text-[#3C2A21] pt-1">
+                Wassalamu&apos;alaikum warahmatullahi wabarakatuh
+              </p>
+              <div className="pt-2">
+                <span className="font-sr-sans text-xs text-[#6E5D53]">Kami Yang Berbahagia</span>
+                <h4 className="font-sr-script text-3xl sm:text-4xl text-[#8A4B32] font-semibold mt-1">
                   {brideNickname} &amp; {groomNickname}
                 </h4>
               </div>
             </motion.div>
-
           </div>
 
           {/* Aesthetic Luxury Footer Branding */}
-          <footer className="relative z-20 bg-gradient-to-b from-[#8A4B32] to-[#6E3622] text-white pt-10 pb-16 px-6 text-center shadow-2xl">
-            <div className="max-w-xs mx-auto space-y-5">
+          <footer className="relative z-20 bg-gradient-to-b from-[#632E1A] via-[#4D2313] to-[#331509] text-white pt-10 pb-24 px-6 text-center shadow-2xl border-t border-[#D4A373]/25">
+            <div className="max-w-sm mx-auto space-y-5">
               
-              {/* Brand Pill Badge */}
-              <div className="inline-flex items-center gap-2.5 bg-white/10 hover:bg-white/15 backdrop-blur-md px-4 py-2 rounded-full border border-white/20 shadow-md transition-all">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#2DD4BF] to-[#14B8A6] flex items-center justify-center text-white font-bold text-xs shadow-inner">
-                  S
+              {/* Brand Logo & Monogram */}
+              <div className="flex flex-col items-center justify-center space-y-2">
+                <div className="w-11 h-11 rounded-full bg-gradient-to-br from-[#8A4B32] to-[#2B1006] border border-[#E6C280]/60 ring-2 ring-[#E6C280]/20 flex items-center justify-center shadow-lg">
+                  <span className="font-serif font-bold text-lg text-[#F5EDE2] tracking-normal">S</span>
                 </div>
-                <div className="text-left leading-none">
-                  <span className="font-sans font-bold text-sm tracking-wide text-white block">SeraStory</span>
-                  <span className="font-sr-sans text-[8px] text-white/75 tracking-wider uppercase">Bespoke Digital Invitation</span>
+                <div className="text-center space-y-0.5">
+                  <h4 className="font-serif font-bold text-base tracking-[0.2em] text-[#FAF5F0]">SERASTORY</h4>
+                  <p className="font-sr-sans text-[9px] tracking-[0.26em] text-[#E6C280]/80 uppercase font-medium">Bespoke Digital Invitation</p>
                 </div>
               </div>
 
-              {/* Contact Pill Badges */}
+              {/* Social & Contact Badges with Crisp Vector Icons */}
               <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                {/* Instagram */}
                 <a 
                   href="https://instagram.com/serastory.id" 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-[#E6C280]/25 hover:border-[#E6C280]/60 transition-all text-[#FAF5F0] text-xs font-medium shadow-sm hover:scale-[1.03] active:scale-95"
                 >
-                  <span>📸</span>
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                  </svg>
                   <span>serastory.id</span>
                 </a>
 
+                {/* WhatsApp */}
                 <a 
                   href="https://wa.me/6285189970998" 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-[#E6C280]/25 hover:border-[#E6C280]/60 transition-all text-[#FAF5F0] text-xs font-medium shadow-sm hover:scale-[1.03] active:scale-95"
                 >
-                  <span>💬</span>
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/>
+                  </svg>
                   <span>085189970998</span>
                 </a>
 
+                {/* TikTok */}
                 <a 
                   href="https://tiktok.com/@serastory.id" 
                   target="_blank" 
                   rel="noreferrer" 
-                  className="inline-flex items-center gap-1.5 bg-black/20 hover:bg-black/35 backdrop-blur-sm text-[11px] px-3.5 py-1.5 rounded-full border border-white/15 transition-all text-white/95"
+                  className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/[0.07] hover:bg-white/[0.14] border border-[#E6C280]/25 hover:border-[#E6C280]/60 transition-all text-[#FAF5F0] text-xs font-medium shadow-sm hover:scale-[1.03] active:scale-95"
                 >
-                  <span>🎵</span>
+                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.298 0 .591.044.87.13V9.4a6.33 6.33 0 0 0-1-.08A6.34 6.34 0 0 0 3 15.66a6.34 6.34 0 0 0 10.82 4.48 6.3 6.3 0 0 0 1.86-4.48v-6.9a8.16 8.16 0 0 0 4.91 1.63v-3.7z"/>
+                  </svg>
                   <span>serastory.id</span>
                 </a>
               </div>
 
-              {/* Footer Note */}
-              <div className="pt-3 border-t border-white/15 space-y-1">
-                <p className="font-sr-sans text-[10px] tracking-[0.25em] uppercase text-white/80 font-medium">
+              {/* Consultation CTA Button */}
+              <div className="pt-2">
+                <a 
+                  href="https://wa.me/6285189970998?text=Halo%20SeraStory,%20saya%20tertarik%20untuk%20membuat%20undangan%20pernikahan%20digital"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[#D4A373] to-[#B3784A] hover:from-[#DFC29A] hover:to-[#C18556] text-[#2A1206] text-xs font-bold tracking-wider uppercase shadow-lg hover:shadow-[#D4A373]/30 transition-all active:scale-95"
+                >
+                  <span>Hubungi Kami</span>
+                  <span className="text-sm">→</span>
+                </a>
+              </div>
+
+              {/* Footer Note & Copyright */}
+              <div className="pt-4 border-t border-white/10 space-y-1.5">
+                <p className="font-sr-sans text-[10px] tracking-[0.22em] uppercase text-[#FAF5F0]/80 font-medium">
                   HUBUNGI KAMI UNTUK UNDANGAN PERNIKAHAN ANDA
                 </p>
-                <p className="font-sr-sans text-[9px] text-white/50 tracking-wider">
+                <p className="font-sr-sans text-[9px] text-[#D8B4A6]/60 tracking-wider">
                   © 2026 SeraStory. All Rights Reserved.
                 </p>
               </div>
