@@ -37,6 +37,14 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const groomMother = (project as any)?.groom_mother || "Ibu Orang Tua";
   const groomIg = (project as any)?.groom_instagram ? (project as any).groom_instagram.replace("@", "") : "";
 
+  // Helper to format parent names without duplicate prefix
+  const formatParentName = (name?: string | null, prefix: 'Bapak' | 'Ibu' = 'Bapak') => {
+    if (!name) return `${prefix} -`;
+    const trimmed = name.trim();
+    const clean = trimmed.replace(/^(bapak|bpk\.?|ayah|ayahanda|ibu|ibunda)\s+/i, '').trim();
+    return `${prefix} ${clean}`;
+  };
+
   // Exact couple photo matching reference
   const coverPhoto = project?.cover_photo_url || project?.opening_photo_url || "/assets/template/couple-cover.jpg";
   const bridePhoto = project?.bride_photo_url || "/assets/template/bride-portrait.jpg";
@@ -83,14 +91,17 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     }
   ];
 
-  const loveStories = Array.isArray((project as any)?.love_story_items) && (project as any).love_story_items.length > 0
+  const isDemo = !project?.id || project?.id === "default" || (typeof project?.project_name === "string" && project.project_name.toLowerCase() === "sienna-rustic");
+  const userLoveStories = Array.isArray((project as any)?.love_story_items) && (project as any).love_story_items.length > 0
     ? (project as any).love_story_items.map((item: any, idx: number) => ({
         id: item.id || String(idx + 1),
         title: item.title || ('Cerita #' + (idx + 1)),
         date: item.year || item.date || "",
         desc: item.desc || item.description || ""
       }))
-    : defaultLoveStories;
+    : (isDemo ? defaultLoveStories : []);
+
+  const loveStories = userLoveStories;
 
   // Dynamic Payment Accounts
   const defaultPaymentAccounts = [
@@ -114,7 +125,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
   const physicalGiftAddress = (project as any)?.wishlist_note 
     || (project as any)?.venue_address 
-    || "Villa Nusa Permai, Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur";
+    || (events && events.length > 0 ? (events[0].venue_address || events[0].venue_name) : "") || "";
 
   // Dynamic Events List
   const defaultEvents = [
@@ -330,7 +341,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const [isSubmittingRsvp, setIsSubmittingRsvp] = useState(false);
   const [rsvpSuccessMsg, setRsvpSuccessMsg] = useState(false);
 
-  // Wishes List State
+  // Wishes List State (Dynamically populated from initialWishes or starts empty)
   const [wishesList, setWishesList] = useState<{
     name: string;
     message: string;
@@ -339,12 +350,30 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     attendance?: "hadir" | "tidak_hadir";
     pax?: number;
     created_at?: string;
-  }[]>([
-    { name: "Erika", message: "Opiiii selamaaaattt😍 lancar sampai hari h yaaaa❤️", initial: "ER", color: "bg-[#5B8C5A]", attendance: "hadir", pax: 2, created_at: "2 jam yang lalu" },
-    { name: "RAISA 8i N3RIZI", message: "selamat ya pak,semoga lancar sampai hari H'y,semoga jadi keluarga samawa,barokah dan langgeng bahagia dunia akhirat ya....aamiin", initial: "RN", color: "bg-[#8A4B32]", attendance: "hadir", pax: 1, created_at: "4 jam yang lalu" },
-    { name: "Fajar ramadan", message: "Semoga lancar sampai akhir pak🫡", initial: "FR", color: "bg-[#B3784A]", attendance: "hadir", pax: 2, created_at: "Kemarin" },
-    { name: "rafa", message: "Selamat menempuh hidup baru, semoga bahagia selalu!", initial: "RA", color: "bg-[#6E5D53]", attendance: "hadir", pax: 1, created_at: "Kemarin" },
-  ]);
+  }[]>(() => {
+    if (initialWishes && Array.isArray(initialWishes) && initialWishes.length > 0) {
+      const colors = ["bg-[#5B8C5A]", "bg-[#8A4B32]", "bg-[#B3784A]", "bg-[#6E5D53]"];
+      return initialWishes.map((w: any, idx: number) => {
+        const initials = (w.name || "Tamu")
+          .trim()
+          .split(" ")
+          .map((part: string) => part[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase();
+        return {
+          name: w.name || "Tamu Undangan",
+          message: w.message || "",
+          initial: initials || "TU",
+          color: colors[idx % colors.length],
+          attendance: w.attendance || "hadir",
+          pax: w.pax || 1,
+          created_at: w.created_at ? new Date(w.created_at).toLocaleDateString("id-ID", { day: "numeric", month: "short" }) : "Baru saja",
+        };
+      });
+    }
+    return [];
+  });
 
   const handleSubmitRsvp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -904,7 +933,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Wanita</p>
-                <p className="text-[11px] leading-tight">Putri dari Bapak {brideFather}{brideFatherDeceased ? " (Alm)" : ""} &amp; Ibu {brideMother}{brideMotherDeceased ? " (Almh)" : ""}</p>
+                <p className="text-[11px] leading-tight">Putri dari {formatParentName(brideFather, "Bapak")}{brideFatherDeceased ? " (Alm)" : ""} &amp; {formatParentName(brideMother, "Ibu")}{brideMotherDeceased ? " (Almh)" : ""}</p>
               </div>
 
               {brideIg && (
@@ -953,7 +982,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Pria</p>
-                <p className="text-[11px] leading-tight">Putra dari Bapak {groomFather}{groomFatherDeceased ? " (Alm)" : ""} &amp; Ibu {groomMother}{groomMotherDeceased ? " (Almh)" : ""}</p>
+                <p className="text-[11px] leading-tight">Putra dari {formatParentName(groomFather, "Bapak")}{groomFatherDeceased ? " (Alm)" : ""} &amp; {formatParentName(groomMother, "Ibu")}{groomMotherDeceased ? " (Almh)" : ""}</p>
               </div>
 
               {groomIg && (
@@ -1101,84 +1130,15 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               );
             })}
 
-            {/* Card 2: Resepsi */}
-            <motion.div 
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: false, amount: 0.25 }}
-              transition={{ duration: 0.65, delay: 0.12, ease: "easeOut" }}
-              className="relative rounded-[28px] p-6 sm:p-7 text-center shadow-2xl overflow-hidden border border-[#D4A373]/30 bg-[#FFFDF9]/95 text-[#3C2A21] space-y-4"
-              style={{ backgroundImage: `url(/assets/template/SR-bg.jpg)`, backgroundSize: "cover" }}
-            >
-              <div className="inline-block px-3.5 py-1 rounded-full bg-[#8A4B32]/10 text-[#8A4B32] font-sr-sans text-[10px] font-bold tracking-[0.2em] uppercase">
-                Perayaan &amp; Ramah Tamah
-              </div>
-
-              <h4 className="font-sr-script text-4xl sm:text-5xl text-[#8A4B32] font-semibold">
-                Resepsi
-              </h4>
-
-              {/* Date Block with Balanced Hierarchy */}
-              <div className="flex items-center justify-center gap-3 py-2 border-y border-[#8A4B32]/15 max-w-[270px] mx-auto">
-                <div className="text-right flex-1">
-                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Sabtu</span>
-                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Siang Hari</span>
-                </div>
-                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
-                <div className="px-2 text-center">
-                  <span className="block font-serif text-3xl sm:text-4xl font-extrabold text-[#8A4B32] leading-none">23</span>
-                  <span className="block font-sr-sans text-[10px] font-bold tracking-widest text-[#8A4B32] uppercase mt-0.5">2026</span>
-                </div>
-                <div className="w-[1.5px] h-9 bg-[#8A4B32]/25" />
-                <div className="text-left flex-1">
-                  <span className="block font-sr-sans text-xs font-bold uppercase tracking-wider text-[#5C4A40]">Mei</span>
-                  <span className="block font-sr-sans text-[10px] text-[#8C7A70]">Bulan Baik</span>
-                </div>
-              </div>
-
-              {/* Time Pill Badge */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#8A4B32] text-white font-sr-sans text-xs font-semibold shadow-sm">
-                <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <circle cx="12" cy="12" r="10" />
-                  <polyline points="12 6 12 12 16 14" />
-                </svg>
-                <span>Pukul 11:00 WIB - Selesai</span>
-              </div>
-
-              {/* Location Info */}
-              <div className="pt-1 space-y-1">
-                <h5 className="font-sr-sans font-bold text-sm text-[#3C2A21]">
-                  Villa Nusa Permai
-                </h5>
-                <p className="font-sr-sans text-xs text-[#5C4A40] leading-relaxed max-w-[280px] mx-auto">
-                  Blok L 2/1 Dapur Dahar, Desa Sukamulya, Kecamatan Cugenang, Cianjur
-                </p>
-              </div>
-
-              {/* Google Maps Button */}
-              <div className="pt-1">
-                <a 
-                  href="https://maps.google.com/?q=Villa+Nusa+Permai+blok+L+2/1+Dapur+Dahar+Desa+Sukamulya+Kecamatan+Cugenang+Cianjur" 
-                  target="_blank" 
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
-                >
-                  <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
-                  </svg>
-                  <span>Buka Google Maps</span>
-                </a>
-              </div>
-            </motion.div>
-
           </div>
         </section>
 
         {/* ===================================================================== */}
         {/* SECTION 6 - LOVE STORY (Matching Referensi Gambar 2) */}
         {/* ===================================================================== */}
-        <section 
-          id="story-section"
+        {loveStories.length > 0 && (
+          <section 
+            id="story-section"
           className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#f5ede2]"
         >
           {/* Background Texture */}
@@ -1273,6 +1233,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
             </div>
           </div>
         </section>
+        )}
 
         {/* ===================================================================== */}
         {/* SECTION 7 - OUR MOMENTS / GALLERY (Matching Referensi Gambar 3 Atas) */}
@@ -1839,7 +1800,12 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                 </div>
 
                 <div className="space-y-3 max-h-80 overflow-y-auto pr-1">
-                  {wishesList.map((item, idx) => (
+                  {wishesList.length === 0 ? (
+                    <div className="text-center py-8 text-xs text-[#8C7A70] italic">
+                      Belum ada doa &amp; ucapan. Jadilah yang pertama memberikan doa &amp; ucapan!
+                    </div>
+                  ) : (
+                    wishesList.map((item, idx) => (
                     <motion.div
                       key={idx}
                       initial={{ opacity: 0, y: 15 }}
@@ -1882,7 +1848,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                         {item.message}
                       </p>
                     </motion.div>
-                  ))}
+                  )))}
                 </div>
               </div>
 
