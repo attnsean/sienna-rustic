@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 import { 
   WhatsAppGatewayConfig, 
   WhatsAppQRSession,
   UserWhatsAppContact,
   BlastGuest, 
-  DEFAULT_MESSAGE_TEMPLATE, 
+  DEFAULT_MESSAGE_TEMPLATE, buildDefaultBlastTemplate, 
   formatIndonesianPhone, 
   formatPhoneDisplay, 
   generateInvitationLink, 
@@ -127,7 +127,7 @@ export const BUNDLE_WA_BLAST_CONFIG: Record<string, { max_wa_blast: number; has_
 };
 
 export default function RSVPDashboard() {
-  const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || 'f93ad18d-cba2-4de0-a86b-b1fadf2783a2';
+  const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '7935c1fb-0a5e-47f8-8a14-4f440b02b430';
   const [project, setProject] = useState<any>(null);
   const [rsvps, setRsvps] = useState<RSVPData[]>([]);
   const [gifts, setGifts] = useState<GiftItem[]>([]);
@@ -183,6 +183,7 @@ export default function RSVPDashboard() {
   // Load Session and Real Contacts on Mount
   useEffect(() => {
     if (typeof window === 'undefined') return;
+    try { localStorage.removeItem('wa_manual_disconnected_' + projectId); } catch (e) {}
     const existing = getStoredSession(projectId);
     const isExplicitlyActive = sessionStorage.getItem('wa_session_active_' + projectId) === 'true';
     if (existing && existing.status === 'connected' && isExplicitlyActive) {
@@ -196,24 +197,28 @@ export default function RSVPDashboard() {
     }
     const rawSaved = getStoredContacts(projectId);
     const sanitized = (rawSaved || []).map(c => {
-      const idStr = String(c.id || '');
-      const isGroup = Boolean(c.isGroup || idStr.endsWith('@g.us') || idStr.startsWith('1203') || (c.phone && c.phone.startsWith('1203')));
-      let phone = isGroup ? '' : (c.phone || '');
-      if (!isGroup) {
-        if (phone.length > 15 || phone.startsWith('32427') || phone.startsWith('24623')) {
-          const cleanName = (c.name || '').replace(/[^0-9]/g, '');
-          if ((cleanName.startsWith('62') || cleanName.startsWith('08')) && cleanName.length >= 10 && cleanName.length <= 15) {
-            phone = cleanName;
-          } else {
-            phone = '';
-          }
-        }
+      const idStr = String(c.id || "");
+      const rawPhoneDigits = String(c.phone || "").replace(/[^0-9]/g, "");
+      const rawNameDigits = String(c.name || "").replace(/[^0-9]/g, "");
+      const isIndoPhone =
+        ((rawPhoneDigits.startsWith("62") || rawPhoneDigits.startsWith("08")) && rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 15) ||
+        ((rawNameDigits.startsWith("62") || rawNameDigits.startsWith("08")) && rawNameDigits.length >= 10 && rawNameDigits.length <= 15);
+
+      const isExplicitPersonal = idStr.endsWith("@c.us") || idStr.endsWith("@lid") || isIndoPhone;
+      const isGroup = !isExplicitPersonal && Boolean(idStr.endsWith("@g.us") || Boolean((c.id as any)?.server === "g.us"));
+
+      let realPhone = isGroup ? "" : (c.phone || (isIndoPhone ? (rawPhoneDigits.length >= 10 ? rawPhoneDigits : rawNameDigits) : ""));
+      let displayName = (c.name || "").trim();
+      if (!displayName || (displayName === "Grup WhatsApp" && !isGroup)) {
+        displayName = isGroup ? "Grup WhatsApp" : (realPhone ? formatIndonesianPhone(realPhone) : "Kontak");
       }
+
       return {
         ...c,
+        name: displayName,
         isGroup,
-        phone: isGroup ? '' : formatIndonesianPhone(phone),
-        category: (isGroup ? 'Grup WhatsApp' : (c.category === 'Grup WhatsApp' ? 'Kontak Pribadi' : (c.category || 'Kontak Pribadi'))) as any
+        phone: isGroup ? "" : formatIndonesianPhone(realPhone),
+        category: (isGroup ? "Grup WhatsApp" : "Kontak Pribadi") as any
       };
     });
     setWaContacts(sanitized);
@@ -236,10 +241,16 @@ export default function RSVPDashboard() {
         console.log('Realtime Bot Status:', payload);
         setIsPcBotOnline(true);
 
-        if (payload?.status === 'qr' && payload?.qr) {
+        if (payload?.qr) {
           try {
             localStorage.removeItem('wa_manual_disconnected_' + projectId);
           } catch (e) {}
+          setWaSession({
+            status: 'qr',
+            qrCodeValue: payload.qr
+          });
+          setWaQrCountdown(60);
+        } else if (payload?.status === 'qr' && payload?.qr) {
           setWaSession({
             status: 'qr',
             qrCodeValue: payload.qr
@@ -262,6 +273,7 @@ export default function RSVPDashboard() {
           sessionStorage.setItem('wa_session_active_' + projectId, 'true');
           saveStoredSession(newSession, projectId);
         } else if (payload?.status === 'disconnected') {
+          try { localStorage.removeItem('wa_manual_disconnected_' + projectId); } catch (e) {}
           clearStoredSession(projectId);
           sessionStorage.removeItem('wa_session_active_' + projectId);
           setWaSession({ status: 'loading', qrCodeValue: '', authMessage: 'Menyiapkan QR Code baru...' });
@@ -271,36 +283,38 @@ export default function RSVPDashboard() {
         if (payload?.contacts && Array.isArray(payload.contacts) && payload.contacts.length > 0) {
           const formatted: UserWhatsAppContact[] = payload.contacts.map((c: any) => {
             const idStr = String(c.id || '');
-            const isGroup = Boolean(
-              c.isGroup ||
+            const rawPhoneDigits = String(c.phone || '').replace(/[^0-9]/g, '');
+            const rawNameDigits = String(c.name || '').replace(/[^0-9]/g, '');
+            const isIndoPhone =
+              ((rawPhoneDigits.startsWith('62') || rawPhoneDigits.startsWith('08')) && rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 15) ||
+              ((rawNameDigits.startsWith('62') || rawNameDigits.startsWith('08')) && rawNameDigits.length >= 10 && rawNameDigits.length <= 15);
+
+            const isExplicitPersonal = idStr.endsWith('@c.us') || idStr.endsWith('@lid') || isIndoPhone;
+            const isGroup = !isExplicitPersonal && Boolean(
               idStr.endsWith('@g.us') ||
-              idStr.startsWith('1203') ||
-              (c.id && c.id.server === 'g.us')
+              Boolean((c.id as any)?.server === 'g.us')
             );
 
-            let rawPhone = '';
+            let realPhone = '';
             if (!isGroup) {
-              if (c.phone) {
-                rawPhone = String(c.phone).replace(/[^0-9]/g, '');
+              if (rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 15) {
+                realPhone = rawPhoneDigits;
+              } else if (rawNameDigits.length >= 10 && rawNameDigits.length <= 15) {
+                realPhone = rawNameDigits;
               } else if (idStr.endsWith('@c.us')) {
-                rawPhone = idStr.replace('@c.us', '').replace(/[^0-9]/g, '');
-              } else {
-                const cleanName = (c.name || '').replace(/[^0-9]/g, '');
-                if ((cleanName.startsWith('62') || cleanName.startsWith('08')) && cleanName.length >= 10 && cleanName.length <= 15) {
-                  rawPhone = cleanName;
-                }
+                realPhone = idStr.replace('@c.us', '').replace(/[^0-9]/g, '');
               }
             }
 
             let displayName = (c.name || '').trim();
-            if (!displayName) {
-              displayName = isGroup ? 'Grup WhatsApp' : (rawPhone ? `+${rawPhone}` : 'Kontak');
+            if (!displayName || (displayName === 'Grup WhatsApp' && !isGroup)) {
+              displayName = isGroup ? 'Grup WhatsApp' : (realPhone ? formatIndonesianPhone(realPhone) : 'Kontak');
             }
 
             return {
               id: idStr,
               name: displayName,
-              phone: isGroup ? '' : formatIndonesianPhone(rawPhone),
+              phone: isGroup ? '' : formatIndonesianPhone(realPhone),
               isGroup: isGroup,
               category: (isGroup ? 'Grup WhatsApp' : 'Kontak Pribadi') as any,
               avatarUrl: c.profilePicUrl || undefined
@@ -364,6 +378,7 @@ export default function RSVPDashboard() {
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
           channel.send({ type: 'broadcast', event: 'get_status' });
+          channel.send({ type: 'broadcast', event: 'request_contacts' });
         }
       });
 
@@ -383,13 +398,19 @@ export default function RSVPDashboard() {
           type: 'broadcast',
           event: 'get_status'
         }).catch(() => {});
+        if (!waSession?.qrCodeValue) {
+          botChannelRef.current.send({
+            type: 'broadcast',
+            event: 'request_qr'
+          }).catch(() => {});
+        }
       }
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 2500);
+    const interval = setInterval(checkStatus, 2000);
     return () => clearInterval(interval);
-  }, [waSession?.status, projectId]);
+  }, [waSession?.status, waSession?.qrCodeValue, projectId]);
 
   // QR Refresh Countdown Timer
   useEffect(() => {
@@ -497,6 +518,9 @@ export default function RSVPDashboard() {
   const persistBlastTemplate = (template: string) => {
     setBlastTemplate(template);
     try {
+      if (projectId) {
+        localStorage.setItem(`wa_blast_template_${projectId}`, template);
+      }
       localStorage.setItem('wa_blast_template', template);
     } catch (_) {}
     syncBlastConfigToSupabase({ message_template: template });
@@ -591,12 +615,19 @@ export default function RSVPDashboard() {
       if (savedConfig) {
         setWaGatewayConfig(JSON.parse(savedConfig));
       }
-      const savedTemplate = localStorage.getItem('wa_blast_template');
-      if (savedTemplate && savedTemplate.trim() !== 'test' && savedTemplate.trim().length > 15) {
+      const localKey = projectId ? `wa_blast_template_${projectId}` : 'wa_blast_template';
+      const savedTemplate = localStorage.getItem(localKey) || localStorage.getItem('wa_blast_template');
+      const isLegacyIwanNurul = savedTemplate && (savedTemplate.includes('NURUL & IWAN') || savedTemplate.includes('Sumber Waras 1 No. 71'));
+
+      if (savedTemplate && savedTemplate.trim() !== 'test' && savedTemplate.trim().length > 15 && !isLegacyIwanNurul) {
         setBlastTemplate(savedTemplate);
       } else {
-        setBlastTemplate(DEFAULT_MESSAGE_TEMPLATE);
-        localStorage.setItem('wa_blast_template', DEFAULT_MESSAGE_TEMPLATE);
+        const initialTpl = buildDefaultBlastTemplate(project);
+        setBlastTemplate(initialTpl);
+        try {
+          if (projectId) localStorage.setItem(`wa_blast_template_${projectId}`, initialTpl);
+          localStorage.setItem('wa_blast_template', initialTpl);
+        } catch (_) {}
       }
       const savedGuests = localStorage.getItem('wa_blast_guest_list');
       if (savedGuests) {
@@ -655,7 +686,7 @@ export default function RSVPDashboard() {
           phone: formattedSender || '6281234567890',
           message: 'Halo! Ini adalah pesan verifikasi koneksi WhatsApp Gateway Management Suite Nurul & Iwan.',
           gatewayConfig: configToSave,
-          projectId: projectId || 'f93ad18d-cba2-4de0-a86b-b1fadf2783a2'
+          projectId: projectId || '7935c1fb-0a5e-47f8-8a14-4f440b02b430'
         })
       });
       const data = await testRes.json();
@@ -680,7 +711,7 @@ export default function RSVPDashboard() {
     setShowDisconnectConfirm(false);
     try {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('wa_manual_disconnected_' + projectId, 'true');
+        try { localStorage.removeItem('wa_manual_disconnected_' + projectId); } catch (e) {}
         localStorage.removeItem('wa_web_session_v2');
         localStorage.removeItem('wa_web_session_v2_' + projectId);
         localStorage.removeItem('wa_web_session_v2_default');
@@ -716,6 +747,23 @@ export default function RSVPDashboard() {
       }
     } catch (e) {}
   };
+
+  const filteredContactsList = useMemo(() => {
+    return (waContacts || []).filter((c) => {
+      if (waContactsCategory === 'Grup WhatsApp') {
+        if (!c.isGroup) return false;
+      } else if (waContactsCategory === 'Kontak Pribadi') {
+        if (c.isGroup) return false;
+      }
+      if (waContactsSearch.trim()) {
+        const query = waContactsSearch.toLowerCase();
+        const matchName = (c.name || '').toLowerCase().includes(query);
+        const matchPhone = (c.phone || '').toLowerCase().includes(query);
+        return matchName || matchPhone;
+      }
+      return true;
+    });
+  }, [waContacts, waContactsCategory, waContactsSearch]);
 
   const handleAddSelectedWaContactsToBlast = () => {
     const selectedContacts = waContacts.filter(c => selectedWaContactIds.has(c.id));
@@ -1155,7 +1203,8 @@ export default function RSVPDashboard() {
 
   const handleResetTemplate = () => {
     if (confirm('Kembalikan template pesan ke draf resmi undangan?')) {
-      persistBlastTemplate(DEFAULT_MESSAGE_TEMPLATE);
+      const defaultTpl = buildDefaultBlastTemplate(project);
+      persistBlastTemplate(defaultTpl);
     }
   };
 
@@ -1437,6 +1486,22 @@ export default function RSVPDashboard() {
         };
         setProject(mergedProject);
         setDbPassword(mergedProject.hashtag || "serastory");
+
+        const isActuallyIwan = /iwan|nurul/i.test(mergedProject.bride_name || "") || /iwan|nurul/i.test(mergedProject.groom_name || "");
+        setBlastTemplate((currentTpl) => {
+          const isLegacy = !isActuallyIwan && (currentTpl.includes("NURUL & IWAN") || currentTpl.includes("Sumber Waras 1 No. 71"));
+          const isGeneric = currentTpl.includes("*THE WEDDING*") || currentTpl.trim().length <= 15;
+          if (isLegacy || isGeneric) {
+            const freshTpl = buildDefaultBlastTemplate(mergedProject);
+            try {
+              if (projectId) localStorage.setItem(`wa_blast_template_${projectId}`, freshTpl);
+              localStorage.setItem("wa_blast_template", freshTpl);
+            } catch (_) {}
+            syncBlastConfigToSupabase({ message_template: freshTpl });
+            return freshTpl;
+          }
+          return currentTpl;
+        });
 
         try {
           if (mergedProject.love_story) {
@@ -1813,10 +1878,23 @@ export default function RSVPDashboard() {
               } catch (_) {}
             }
             if (typeof storedConfig?.message_template === 'string' && storedConfig.message_template.trim().length > 15) {
-              setBlastTemplate(storedConfig.message_template);
-              try {
-                localStorage.setItem('wa_blast_template', storedConfig.message_template);
-              } catch (_) {}
+              const isActuallyIwan = /iwan|nurul/i.test(project?.bride_name || "") || /iwan|nurul/i.test(project?.groom_name || "");
+              const isLegacy = !isActuallyIwan && (storedConfig.message_template.includes("NURUL & IWAN") || storedConfig.message_template.includes("Sumber Waras 1 No. 71"));
+              if (!isLegacy) {
+                setBlastTemplate(storedConfig.message_template);
+                try {
+                  if (projectId) localStorage.setItem(`wa_blast_template_${projectId}`, storedConfig.message_template);
+                  localStorage.setItem('wa_blast_template', storedConfig.message_template);
+                } catch (_) {}
+              } else {
+                const freshTpl = buildDefaultBlastTemplate(project);
+                setBlastTemplate(freshTpl);
+                try {
+                  if (projectId) localStorage.setItem(`wa_blast_template_${projectId}`, freshTpl);
+                  localStorage.setItem('wa_blast_template', freshTpl);
+                } catch (_) {}
+                syncBlastConfigToSupabase({ message_template: freshTpl });
+              }
             }
             if (Array.isArray(data.recent_logs)) {
               setBlastLogs(data.recent_logs);
@@ -3662,6 +3740,23 @@ export default function RSVPDashboard() {
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '150ms' }} />
                           <span className="w-2 h-2 rounded-full bg-emerald-500 animate-bounce" style={{ animationDelay: '300ms' }} />
                         </div>
+
+                        {/* Interactive Retry Button */}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            if (botChannelRef.current) {
+                              botChannelRef.current.send({ type: 'broadcast', event: 'request_qr' });
+                              botChannelRef.current.send({ type: 'broadcast', event: 'get_status' });
+                            }
+                          }}
+                          className="relative z-10 mt-1 px-4 py-1.5 text-xs font-semibold text-emerald-800 bg-emerald-100/90 hover:bg-emerald-200 border border-emerald-300 rounded-full transition-all flex items-center gap-1.5 cursor-pointer shadow-xs active:scale-95"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                          </svg>
+                          <span>Muat Ulang QR Code</span>
+                        </button>
                       </div>
                     )}
                   </div>
@@ -3955,7 +4050,36 @@ export default function RSVPDashboard() {
                           Masukkan data tamu secara manual (tanpa akses kontak otomatis).
                         </p>
                       </div>
-                      <div className="flex items-center gap-2 self-stretch sm:self-auto justify-end">
+                      <div className="flex flex-wrap items-center gap-2 self-stretch sm:self-auto justify-end">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWaContactsCategory('Grup WhatsApp');
+                            setShowMyContactsModal(true);
+                            if (botChannelRef.current) {
+                              botChannelRef.current.send({ type: 'broadcast', event: 'request_contacts' });
+                            }
+                          }}
+                          className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5 shadow-sm active:scale-95"
+                        >
+                          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                          </svg>
+                          <span>👥 Pilih Grup WhatsApp</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWaContactsCategory('Kontak Pribadi');
+                            setShowMyContactsModal(true);
+                            if (botChannelRef.current) {
+                              botChannelRef.current.send({ type: 'broadcast', event: 'request_contacts' });
+                            }
+                          }}
+                          className="px-3 py-1.5 sm:px-3.5 sm:py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 text-[10px] font-bold uppercase tracking-wider rounded-xl transition-all cursor-pointer whitespace-nowrap flex items-center gap-1.5"
+                        >
+                          <span>👤 Kontak WA</span>
+                        </button>
                         <button
                           type="button"
                           onClick={() => setManualInputMode(manualInputMode === 'single' ? 'bulk' : 'single')}
@@ -4165,12 +4289,25 @@ export default function RSVPDashboard() {
                                     />
                                   </td>
                                   <td className="py-2.5 px-3">
-                                    <span className="text-xs font-bold text-neutral-900 block truncate max-w-[200px]">
-                                      {guest.name}
-                                    </span>
+                                    <div className="flex items-center gap-1.5">
+                                      {guest.isGroup && (
+                                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-bold uppercase tracking-wider shrink-0">
+                                          👥 Grup WA
+                                        </span>
+                                      )}
+                                      <span className="text-xs font-bold text-neutral-900 block truncate max-w-[200px]">
+                                        {guest.name}
+                                      </span>
+                                    </div>
                                   </td>
                                   <td className="py-2.5 px-3 font-mono text-xs text-neutral-700 whitespace-nowrap">
-                                    {displayPhone || guest.phone}
+                                    {guest.isGroup ? (
+                                      <span className="text-[10px] text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-sans font-semibold border border-emerald-200">
+                                        Grup WhatsApp
+                                      </span>
+                                    ) : (
+                                      displayPhone || guest.phone
+                                    )}
                                   </td>
                                   <td className="py-2.5 px-3">
                                     <div className="flex items-center gap-1.5">
@@ -4546,6 +4683,209 @@ export default function RSVPDashboard() {
               )}
             </div>
           )}
+
+            {/* Modal: Pilih Dari Kontak & Grup WhatsApp */}
+            {showMyContactsModal && (
+              <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6 bg-neutral-900/40 backdrop-blur-md animate-in fade-in duration-300">
+                <div className="bg-white w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden border border-neutral-100 flex flex-col max-h-[85vh]">
+                  {/* Modal Header */}
+                  <div className="p-5 sm:p-6 border-b border-neutral-100 flex items-center justify-between bg-neutral-50/50">
+                    <div>
+                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[9px] font-bold uppercase tracking-wider mb-1">
+                        👥 WhatsApp Web Sync
+                      </div>
+                      <h4 className="text-base sm:text-lg font-serif font-bold text-neutral-900">Pilih Grup & Kontak WhatsApp</h4>
+                      <p className="text-xs text-neutral-400 mt-0.5">Pilih grup WhatsApp atau kontak pribadi untuk dimasukkan ke daftar blast</p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowMyContactsModal(false)}
+                      className="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 text-neutral-500 hover:text-neutral-900 flex items-center justify-center cursor-pointer transition-colors"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {/* Filter Tabs & Search */}
+                  <div className="p-4 sm:p-6 border-b border-neutral-100 space-y-3 bg-white">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      {/* Tabs */}
+                      <div className="inline-flex p-1 bg-neutral-100 rounded-xl text-xs font-medium">
+                        <button
+                          type="button"
+                          onClick={() => setWaContactsCategory('Grup WhatsApp')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                            waContactsCategory === 'Grup WhatsApp'
+                              ? 'bg-white text-emerald-700 shadow-xs'
+                              : 'text-neutral-600 hover:text-neutral-900'
+                          }`}
+                        >
+                          <span>👥 Grup WhatsApp</span>
+                          <span className="px-1.5 py-0.2 bg-emerald-50 text-emerald-700 rounded-full text-[10px]">
+                            {waContacts.filter(c => c.isGroup).length}
+                          </span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWaContactsCategory('all')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            waContactsCategory === 'all'
+                              ? 'bg-white text-neutral-900 shadow-xs'
+                              : 'text-neutral-600 hover:text-neutral-900'
+                          }`}
+                        >
+                          Semua ({waContacts.length})
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setWaContactsCategory('Kontak Pribadi')}
+                          className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                            waContactsCategory === 'Kontak Pribadi'
+                              ? 'bg-white text-neutral-900 shadow-xs'
+                              : 'text-neutral-600 hover:text-neutral-900'
+                          }`}
+                        >
+                          Kontak Pribadi ({waContacts.filter(c => !c.isGroup).length})
+                        </button>
+                      </div>
+
+                      {/* Sync button */}
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (botChannelRef.current) {
+                            botChannelRef.current.send({ type: 'broadcast', event: 'request_contacts' });
+                          }
+                        }}
+                        className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5 cursor-pointer"
+                        title="Tarik kontak & grup terbaru dari WhatsApp Anda"
+                      >
+                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                        </svg>
+                        <span>Sinkronkan Ulang</span>
+                      </button>
+                    </div>
+
+                    {/* Search bar */}
+                    <div className="relative">
+                      <input
+                        type="text"
+                        value={waContactsSearch}
+                        onChange={(e) => setWaContactsSearch(e.target.value)}
+                        placeholder="Cari nama grup atau nama kontak WhatsApp..."
+                        className="w-full bg-neutral-50 border border-neutral-200 px-4 py-2.5 rounded-xl text-xs text-neutral-800 placeholder-neutral-400 focus:outline-none focus:border-neutral-900"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Contact List */}
+                  <div className="p-4 sm:p-6 overflow-y-auto flex-1 divide-y divide-neutral-100">
+                    {/* Select all header */}
+                    <div className="flex items-center justify-between pb-3 text-xs text-neutral-500 font-medium">
+                      <label className="flex items-center gap-2 cursor-pointer select-none">
+                        <input
+                          type="checkbox"
+                          checked={
+                            filteredContactsList.length > 0 &&
+                            filteredContactsList.every(c => selectedWaContactIds.has(c.id))
+                          }
+                          onChange={(e) => {
+                            const checked = e.target.checked;
+                            const newSet = new Set(selectedWaContactIds);
+                            filteredContactsList.forEach(c => {
+                              if (checked) newSet.add(c.id);
+                              else newSet.delete(c.id);
+                            });
+                            setSelectedWaContactIds(newSet);
+                          }}
+                          className="w-4 h-4 rounded text-neutral-900 focus:ring-neutral-900 cursor-pointer accent-neutral-900"
+                        />
+                        <span>Pilih Semua di Kategori Ini ({filteredContactsList.length})</span>
+                      </label>
+                      <span className="font-bold text-neutral-800">
+                        {selectedWaContactIds.size} dipilih
+                      </span>
+                    </div>
+
+                    {filteredContactsList.length === 0 ? (
+                      <div className="py-12 text-center text-xs text-neutral-400 space-y-2">
+                        <p className="text-2xl">👥</p>
+                        <p className="font-bold text-neutral-600">Tidak ada grup atau kontak ditemukan</p>
+                        <p className="text-[11px]">Pastikan WhatsApp bot di PC Anda sedang terhubung, lalu klik tombol "Sinkronkan Ulang".</p>
+                      </div>
+                    ) : (
+                      filteredContactsList.map(c => {
+                        const isSelected = selectedWaContactIds.has(c.id);
+                        return (
+                          <div
+                            key={c.id}
+                            onClick={() => {
+                              const newSet = new Set(selectedWaContactIds);
+                              if (isSelected) newSet.delete(c.id);
+                              else newSet.add(c.id);
+                              setSelectedWaContactIds(newSet);
+                            }}
+                            className={`flex items-center justify-between py-3 px-2 rounded-xl transition-colors cursor-pointer hover:bg-neutral-50 ${
+                              isSelected ? 'bg-emerald-50/50' : ''
+                            }`}
+                          >
+                            <div className="flex items-center gap-3">
+                              <input
+                                type="checkbox"
+                                checked={isSelected}
+                                onChange={() => {}} // handled by row click
+                                className="w-4 h-4 rounded text-neutral-900 focus:ring-neutral-900 cursor-pointer accent-neutral-900"
+                              />
+                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs ${
+                                c.isGroup ? 'bg-emerald-100 text-emerald-800' : 'bg-neutral-100 text-neutral-700'
+                              }`}>
+                                {c.isGroup ? '👥' : (c.name ? c.name.charAt(0).toUpperCase() : '👤')}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <span className="font-bold text-xs text-neutral-900">{c.name}</span>
+                                  {c.isGroup && (
+                                    <span className="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 text-[9px] font-bold uppercase">
+                                      Grup WhatsApp
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-[11px] text-neutral-400 font-mono">
+                                  {c.isGroup ? 'Grup WhatsApp' : (c.phone || '-')}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    )}
+                  </div>
+
+                  {/* Modal Footer */}
+                  <div className="p-4 sm:p-6 border-t border-neutral-100 bg-neutral-50/50 flex items-center justify-between gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setShowMyContactsModal(false)}
+                      className="px-4 py-2.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-700 text-xs font-bold rounded-xl transition-colors cursor-pointer"
+                    >
+                      Tutup
+                    </button>
+                    <button
+                      type="button"
+                      disabled={selectedWaContactIds.size === 0}
+                      onClick={handleAddSelectedWaContactsToBlast}
+                      className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm active:scale-95 flex items-center gap-2"
+                    >
+                      <span>Tambahkan ke Antrean Blast</span>
+                      <span className="px-2 py-0.5 bg-white/20 rounded-full text-[10px]">
+                        {selectedWaContactIds.size}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Modal: Add Guest */}
             {showAddGuestModal && (
@@ -5230,7 +5570,7 @@ export default function RSVPDashboard() {
                         <div className="p-4 bg-white rounded-2xl border border-neutral-200 shadow-xs flex flex-col items-center text-center space-y-3">
                           <div className="relative group max-w-[240px] w-full bg-white p-2 rounded-xl border border-neutral-200 shadow-xs">
                             <img
-                              src="/qris_serastory.jpg"
+                              src="https://pub-abae589697d744c5a947792076432937.r2.dev/qris_serastory.jpg"
                               alt="QRIS Sera Story"
                               className="w-full h-auto rounded-lg object-contain"
                             />
@@ -5246,7 +5586,7 @@ export default function RSVPDashboard() {
 
                           <div className="flex items-center gap-2 pt-1">
                             <a
-                              href="/qris_serastory.jpg"
+                              href="https://pub-abae589697d744c5a947792076432937.r2.dev/qris_serastory.jpg"
                               download="QRIS_SeraStory.jpg"
                               target="_blank"
                               rel="noopener noreferrer"

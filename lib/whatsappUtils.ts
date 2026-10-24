@@ -104,14 +104,45 @@ export interface ConversationThread {
   messages: RichChatMessage[];
 }
 
-export const DEFAULT_MESSAGE_TEMPLATE = `Kepada Yth.
+export function buildDefaultBlastTemplate(p?: {
+  bride_name?: string;
+  groom_name?: string;
+  bride_nickname?: string;
+  groom_nickname?: string;
+  wedding_date?: string;
+  venue_name?: string;
+  venue_address?: string;
+}): string {
+  const bNick = (p?.bride_nickname || p?.bride_name || "").trim();
+  const gNick = (p?.groom_nickname || p?.groom_name || "").trim();
+  const coupleTitle = bNick && gNick ? `*${bNick.toUpperCase()} & ${gNick.toUpperCase()}*` : `*THE WEDDING*`;
+
+  let dateStr = "";
+  if (p?.wedding_date) {
+    try {
+      const dateVal = p.wedding_date.includes("T") ? p.wedding_date : `${p.wedding_date}T00:00:00`;
+      const d = new Date(dateVal);
+      if (!isNaN(d.getTime())) {
+        dateStr = d.toLocaleDateString("id-ID", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+      }
+    } catch (_) {}
+    if (!dateStr) dateStr = p.wedding_date;
+  }
+
+  const venue = (p?.venue_name || p?.venue_address || "").trim();
+
+  let detailsBlock = coupleTitle;
+  if (dateStr) detailsBlock += `\n📅 ${dateStr}`;
+  if (venue) detailsBlock += `\n📍 ${venue}`;
+
+  const coupleSign = bNick && gNick ? `*${bNick} & ${gNick}*` : "*Kedua Mempelai*";
+
+  return `Kepada Yth.
 *{{guest_name}}*
 
 Tanpa mengurangi rasa hormat, perkenankan kami mengundang Bapak/Ibu/Saudara/i untuk hadir di acara pernikahan kami:
 
-*NURUL & IWAN*
-📅 Senin, 16 November 2026
-📍 Jl. Sumber Waras 1 No. 71, Kalirejo, Lawang, Kab. Malang
+${detailsBlock}
 
 Tautan Undangan Digital Spesial Anda:
 {{invitation_link}}
@@ -119,7 +150,10 @@ Tautan Undangan Digital Spesial Anda:
 Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan untuk hadir dan memberikan doa restu bagi kami berdua.
 
 Salam hangat,
-*Nurul & Iwan*`;
+${coupleSign}`;
+}
+
+export const DEFAULT_MESSAGE_TEMPLATE = buildDefaultBlastTemplate();
 
 /**
  * Auto-format phone number to Indonesian international format (e.g., 628123456789)
