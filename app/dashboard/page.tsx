@@ -349,9 +349,9 @@ export default function RSVPDashboard() {
           if (payload.status === 'sent') {
             setWaBlastSentCount(prev => prev + 1);
             syncBlastConfigToSupabase({ increment_used_wa_blast: 1 });
-            setBlastGuestList(prev => prev.map(g => g.phone === payload.guestPhone ? { ...g, status: 'sent', sentAt: new Date().toISOString() } : g));
+            setBlastGuestList(prev => prev.map(g => (g.phone === payload.guestPhone || (payload.guestId && g.id === payload.guestId)) ? { ...g, status: 'sent', sentAt: new Date().toISOString() } : g));
           } else if (payload.status === 'failed') {
-            setBlastGuestList(prev => prev.map(g => g.phone === payload.guestPhone ? { ...g, status: 'failed', errorReason: payload.error } : g));
+            setBlastGuestList(prev => prev.map(g => (g.phone === payload.guestPhone || (payload.guestId && g.id === payload.guestId)) ? { ...g, status: 'failed', errorReason: payload.error } : g));
           }
         }
       })
@@ -1215,15 +1215,45 @@ export default function RSVPDashboard() {
       return;
     }
 
+    // Always fetch fresh quota from Supabase directly to prevent multiple tabs bypassing quota limits
+    let currentBase = waBlastBaseQuota;
+    let currentExtra = waBlastExtraQuota;
+    let currentSent = waBlastSentCount;
+    let currentHasBlast = hasWABlast;
+
+    try {
+      const { data: freshWed } = await supabase
+        .from('wedding_details')
+        .select('dining_schedule')
+        .eq('project_id', projectId)
+        .maybeSingle();
+
+      if (freshWed?.dining_schedule) {
+        const cfg = freshWed.dining_schedule;
+        if (typeof cfg.max_wa_blast === 'number') currentBase = cfg.max_wa_blast;
+        if (typeof cfg.extra_wa_blast === 'number') currentExtra = cfg.extra_wa_blast;
+        if (typeof cfg.used_wa_blast === 'number') currentSent = cfg.used_wa_blast;
+        if (cfg.has_wa_blast !== undefined) currentHasBlast = Boolean(cfg.has_wa_blast);
+
+        // Update local React state so UI in this tab immediately reflects fresh quota
+        setWaBlastBaseQuota(currentBase);
+        setWaBlastExtraQuota(currentExtra);
+        setWaBlastSentCount(currentSent);
+        setHasWABlast(currentHasBlast);
+      }
+    } catch (err) {
+      console.warn('Gagal memverifikasi kuota terbaru dari Supabase:', err);
+    }
+
     // Check Bundle Permission (hasWABlast)
-    if (!hasWABlast) {
+    if (!currentHasBlast) {
       setShowUpgradeBundleModal(true);
       return;
     }
 
-    // Calculate Quota & Check Limits
-    const totalWaBlastQuota = waBlastBaseQuota + waBlastExtraQuota;
-    const remainingWaBlastQuota = Math.max(0, totalWaBlastQuota - waBlastSentCount);
+    // Calculate Quota & Check Limits using verified fresh Supabase data
+    const totalWaBlastQuota = currentBase + currentExtra;
+    const remainingWaBlastQuota = Math.max(0, totalWaBlastQuota - currentSent);
 
     if (remainingWaBlastQuota <= 0) {
       alert(
