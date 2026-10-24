@@ -80,7 +80,7 @@ interface StoryEvent {
   order: number;
 }
 
-export const OFFICIAL_PACKAGE_PRICES: Record<string, number> = {
+const OFFICIAL_PACKAGE_PRICES: Record<string, number> = {
   basic: 104000,
   silver: 159000,
   premium: 259000,
@@ -88,7 +88,7 @@ export const OFFICIAL_PACKAGE_PRICES: Record<string, number> = {
   exclutif: 449000,
 };
 
-export const BUNDLE_WA_BLAST_CONFIG: Record<string, { max_wa_blast: number; has_wa_blast: boolean; label: string; badge: string; desc: string }> = {
+const BUNDLE_WA_BLAST_CONFIG: Record<string, { max_wa_blast: number; has_wa_blast: boolean; label: string; badge: string; desc: string }> = {
   basic: {
     max_wa_blast: 0,
     has_wa_blast: false,
@@ -538,6 +538,25 @@ export default function RSVPDashboard() {
   const [csvRawText, setCsvRawText] = useState<string>('');
   const [showBulkPasteModal, setShowBulkPasteModal] = useState<boolean>(false);
   const [bulkPasteRawText, setBulkPasteRawText] = useState<string>('');
+  interface WABlastPackage {
+    id?: string;
+    count: number;
+    price: number;
+    price_display: string;
+    label: string;
+    description: string;
+    popular?: boolean;
+    sort_order?: number;
+    is_active?: boolean;
+  }
+
+  const DEFAULT_WA_BLAST_PACKAGES: WABlastPackage[] = [
+    { count: 100, price: 25000, price_display: 'Rp 25.000', label: '+100 Pesan WA Blast', description: 'Cocok untuk pernikahan intim / keluarga dekat' },
+    { count: 250, price: 50000, price_display: 'Rp 50.000', label: '+250 Pesan WA Blast', description: 'Paling Populer • Rekomendasi untuk resepsi standar', popular: true },
+    { count: 500, price: 85000, price_display: 'Rp 85.000', label: '+500 Pesan WA Blast', description: 'Hemat 30% • Kapasitas besar tanpa khawatir kuota habis' },
+  ];
+
+  const [waBlastPackages, setWaBlastPackages] = useState<WABlastPackage[]>(DEFAULT_WA_BLAST_PACKAGES);
   const [showBuyQuotaModal, setShowBuyQuotaModal] = useState<boolean>(false);
   const [showRemovePromoModal, setShowRemovePromoModal] = useState<boolean>(false);
   const [showUpgradeBundleModal, setShowUpgradeBundleModal] = useState<boolean>(false);
@@ -1804,6 +1823,24 @@ export default function RSVPDashboard() {
       supabase.removeChannel(channel);
     };
   }, [activeTab]);
+
+    // Refresh dynamic WA Blast packages whenever the buy quota modal opens
+  useEffect(() => {
+    if (showBuyQuotaModal) {
+      (async () => {
+        try {
+          const { data, error } = await supabase
+            .from('wa_blast_packages')
+            .select('*')
+            .eq('is_active', true)
+            .order('sort_order', { ascending: true });
+          if (!error && data && data.length > 0) {
+            setWaBlastPackages(data);
+          }
+        } catch (_) {}
+      })();
+    }
+  }, [showBuyQuotaModal]);
 
   // Fallback Polling for Bot Status when it is in loading or qr state
   useEffect(() => {
@@ -5065,41 +5102,40 @@ export default function RSVPDashboard() {
                     </p>
 
                     <div className="space-y-2.5">
-                      {[
-                        { count: 100, price: 'Rp 25.000', label: '+100 Pesan WA Blast', desc: 'Cocok untuk pernikahan intim / keluarga dekat' },
-                        { count: 250, price: 'Rp 50.000', label: '+250 Pesan WA Blast', desc: 'Paling Populer • Rekomendasi untuk resepsi standar', popular: true },
-                        { count: 500, price: 'Rp 85.000', label: '+500 Pesan WA Blast', desc: 'Hemat 30% • Kapasitas besar tanpa khawatir kuota habis' },
-                      ].map((pkg) => (
-                        <div
-                          key={pkg.count}
-                          onClick={() => {
-                            openQuotaCheckout(pkg.count, pkg.price, pkg.count === 100 ? 25000 : pkg.count === 250 ? 50000 : 85000);
-                          }}
-                          className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${
-                            pkg.popular
-                              ? 'bg-emerald-50/40 border-emerald-300 hover:border-emerald-500 hover:shadow-md'
-                              : 'bg-neutral-50 hover:bg-white border-neutral-200 hover:border-neutral-900 hover:shadow-xs'
-                          }`}
-                        >
-                          <div className="space-y-1">
-                            <div className="flex items-center gap-2">
-                              <h5 className="text-sm font-bold text-neutral-900 group-hover:text-emerald-700 transition-colors">
-                                {pkg.label}
-                              </h5>
-                              {pkg.popular && (
-                                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider">
-                                  Terpopuler
-                                </span>
-                              )}
+                      {waBlastPackages.map((pkg) => {
+                        const priceDisplay = pkg.price_display || `Rp ${Number(pkg.price).toLocaleString('id-ID')}`;
+                        return (
+                          <div
+                            key={pkg.id || pkg.count}
+                            onClick={() => {
+                              openQuotaCheckout(pkg.count, priceDisplay, pkg.price);
+                            }}
+                            className={`p-4 rounded-2xl border transition-all cursor-pointer flex items-center justify-between group ${
+                              pkg.popular
+                                ? 'bg-emerald-50/40 border-emerald-300 hover:border-emerald-500 hover:shadow-md'
+                                : 'bg-neutral-50 hover:bg-white border-neutral-200 hover:border-neutral-900 hover:shadow-xs'
+                            }`}
+                          >
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <h5 className="text-sm font-bold text-neutral-900 group-hover:text-emerald-700 transition-colors">
+                                  {pkg.label}
+                                </h5>
+                                {pkg.popular && (
+                                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-emerald-600 text-white uppercase tracking-wider">
+                                    Terpopuler
+                                  </span>
+                                )}
+                              </div>
+                              <p className="text-[11px] text-neutral-500">{pkg.description}</p>
                             </div>
-                            <p className="text-[11px] text-neutral-500">{pkg.desc}</p>
+                            <div className="text-right">
+                              <span className="text-base font-serif font-bold text-neutral-900 block">{priceDisplay}</span>
+                              <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block">Beli Kuota →</span>
+                            </div>
                           </div>
-                          <div className="text-right">
-                            <span className="text-base font-serif font-bold text-neutral-900 block">{pkg.price}</span>
-                            <span className="text-[10px] text-emerald-700 font-bold uppercase tracking-wider block">Beli Kuota →</span>
-                          </div>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
 
                     <div className="p-3.5 bg-neutral-50 rounded-2xl border border-neutral-200/80 text-[11px] text-neutral-500 space-y-1 leading-relaxed">
