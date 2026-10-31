@@ -208,7 +208,9 @@ export function generateInvitationLink(arg1: string, arg2?: string): string {
     guestName = arg1 || "";
   }
   const cleanBase = (baseUrl || "https://iwan-nurul.serastory.com").replace(/\/+$/, "");
-  return `${cleanBase}/?to=${encodeURIComponent(guestName.trim())}`;
+  const trimmedName = (guestName || "").trim();
+  if (!trimmedName) return cleanBase;
+  return `${cleanBase}/${encodeURIComponent(trimmedName)}`;
 }
 
 /**

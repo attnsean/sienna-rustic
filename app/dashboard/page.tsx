@@ -4395,7 +4395,7 @@ export default function RSVPDashboard() {
                                   <td className="py-2.5 px-3">
                                     <div className="flex items-center gap-1.5">
                                       <span className="text-[10px] text-neutral-500 font-mono truncate max-w-[120px] bg-neutral-100 px-2 py-0.5 rounded">
-                                        {`/?to=${encodeURIComponent(guest.name)}`}
+                                        {`/${encodeURIComponent(guest.name.trim())}`}
                                       </span>
                                       <button
                                         type="button"
