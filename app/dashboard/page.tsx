@@ -241,21 +241,18 @@ export default function RSVPDashboard() {
         console.log('Realtime Bot Status:', payload);
         setIsPcBotOnline(true);
 
-        if (payload?.qr) {
+        if (payload?.qr || (payload?.status === 'qr' && payload?.qr)) {
           try {
             localStorage.removeItem('wa_manual_disconnected_' + projectId);
           } catch (e) {}
-          setWaSession({
-            status: 'qr',
-            qrCodeValue: payload.qr
+          setWaSession(prev => {
+            if (prev?.status === 'qr' && prev?.qrCodeValue === payload.qr) return prev;
+            return {
+              status: 'qr',
+              qrCodeValue: payload.qr
+            };
           });
-          setWaQrCountdown(60);
-        } else if (payload?.status === 'qr' && payload?.qr) {
-          setWaSession({
-            status: 'qr',
-            qrCodeValue: payload.qr
-          });
-          setWaQrCountdown(60);
+          setWaQrCountdown(prev => (prev > 0 && prev <= 60 ? prev : 60));
         } else if (payload?.status === 'connected') {
           const isManualDisc = typeof window !== 'undefined' && localStorage.getItem('wa_manual_disconnected_' + projectId) === 'true';
           if (isManualDisc) return;
@@ -408,24 +405,18 @@ export default function RSVPDashboard() {
     if (activeTab !== 'blast') return;
     if (waSession?.status === 'connected') return;
 
-    const checkStatus = () => {
-      if (botChannelRef.current) {
+    if (botChannelRef.current) {
+      botChannelRef.current.send({
+        type: 'broadcast',
+        event: 'get_status'
+      }).catch(() => {});
+      if (!waSession?.qrCodeValue) {
         botChannelRef.current.send({
           type: 'broadcast',
-          event: 'get_status'
+          event: 'request_qr'
         }).catch(() => {});
-        if (!waSession?.qrCodeValue) {
-          botChannelRef.current.send({
-            type: 'broadcast',
-            event: 'request_qr'
-          }).catch(() => {});
-        }
       }
-    };
-
-    checkStatus();
-    const interval = setInterval(checkStatus, 2500);
-    return () => clearInterval(interval);
+    }
   }, [activeTab, waSession?.status, waSession?.qrCodeValue, projectId]);
 
   // QR Refresh Countdown Timer
