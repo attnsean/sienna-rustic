@@ -225,7 +225,14 @@ export default function RSVPDashboard() {
     saveStoredContacts(sanitized, projectId);
   }, [projectId]);
 
-  // Supabase Realtime Channel to communicate with PC Bot Server (whatsapp-bot.js)
+  // WA Blast Management State (isBlasting & Ref for realtime safety)
+  const [isBlasting, setIsBlasting] = useState<boolean>(false);
+  const isBlastingRef = useRef(false);
+  useEffect(() => {
+    isBlastingRef.current = isBlasting;
+  }, [isBlasting]);
+
+  // Supabase Realtime Channel to communicate with PC Bot Server (whatsapp-bot.js) (whatsapp-bot.js)
   const botChannelRef = useRef<any>(null);
 
   useEffect(() => {
@@ -240,6 +247,12 @@ export default function RSVPDashboard() {
       .on('broadcast', { event: 'bot_status' }, ({ payload }) => {
         console.log('Realtime Bot Status:', payload);
         setIsPcBotOnline(true);
+
+        // Proteksi Glitch: Jika sedang aktif mengirim blast, jangan izinkan status non-connected merusak layar blast
+        if (isBlastingRef.current && payload?.status !== 'connected') {
+          console.warn('[WA Blast] Mengabaikan status non-connected karena pengiriman blast sedang berlangsung:', payload?.status);
+          return;
+        }
 
         if (payload?.qr || (payload?.status === 'qr' && payload?.qr)) {
           try {
@@ -366,11 +379,15 @@ export default function RSVPDashboard() {
           setCurrentDelayCountdown(payload.delayDuration);
         }
       })
-      .on('broadcast', { event: 'blast_completed' }, () => {
+      .on('broadcast', { event: 'blast_completed' }, (res?: any) => {
         setIsBlasting(false);
+        isBlastingRef.current = false;
         setIsBreakActive(false);
         setBreakCountdown(null);
         setCurrentDelayCountdown(null);
+        if (res?.payload?.error) {
+          alert(res.payload.error);
+        }
       })
       .subscribe((status) => {
         if (status === 'SUBSCRIBED') {
@@ -458,7 +475,6 @@ export default function RSVPDashboard() {
   const [blastGuestList, setBlastGuestList] = useState<BlastGuest[]>([]);
   const [blastTemplate, setBlastTemplate] = useState<string>(DEFAULT_MESSAGE_TEMPLATE);
   const [blastDelay, setBlastDelay] = useState<number>(10);
-  const [isBlasting, setIsBlasting] = useState<boolean>(false);
   const [blastProgress, setBlastProgress] = useState<{ current: number; total: number; currentGuestName?: string }>({ current: 0, total: 0 });
   const [blastFilterStatus, setBlastFilterStatus] = useState<'all' | 'pending' | 'sent' | 'failed'>('all');
   const [blastSearchTerm, setBlastSearchTerm] = useState<string>('');
@@ -1319,6 +1335,7 @@ export default function RSVPDashboard() {
 
     setBlastStep(2);
     setIsBlasting(true);
+    isBlastingRef.current = true;
     blastAbortRef.current = false;
     setBlastProgress({ current: 0, total: targetsToSend.length });
     setIsBreakActive(false);
@@ -3668,7 +3685,7 @@ export default function RSVPDashboard() {
                 </p>
               </div>
             </div>
-          ) : waSession.status !== 'connected' ? (
+          ) : (!isBlasting && waSession.status !== 'connected') ? (
             /* ==============================================================
              * REAL WHATSAPP WEB LINKING SCREEN (DIRECT FROM PC BOT SERVER)
              * ============================================================== */
