@@ -164,7 +164,7 @@ export default function RSVPDashboard() {
 
   // WhatsApp QR Session State (Real Session Flow)
   const [waSession, setWaSession] = useState<WhatsAppQRSession>({
-    status: 'qr',
+    status: 'disconnected',
     qrCodeValue: ''
   });
   const [waContacts, setWaContacts] = useState<UserWhatsAppContact[]>([]);
@@ -191,7 +191,7 @@ export default function RSVPDashboard() {
     } else {
       clearStoredSession(projectId);
       setWaSession({
-        status: 'qr',
+        status: 'disconnected',
         qrCodeValue: ''
       });
     }
@@ -276,7 +276,7 @@ export default function RSVPDashboard() {
           try { localStorage.removeItem('wa_manual_disconnected_' + projectId); } catch (e) {}
           clearStoredSession(projectId);
           sessionStorage.removeItem('wa_session_active_' + projectId);
-          setWaSession({ status: 'loading', qrCodeValue: '', authMessage: 'Menyiapkan QR Code baru...' });
+          setWaSession({ status: 'disconnected', qrCodeValue: '', authMessage: 'WhatsApp belum terhubung' });
         }
       })
       .on('broadcast', { event: 'bot_contacts' }, ({ payload }) => {
@@ -388,8 +388,24 @@ export default function RSVPDashboard() {
     };
   }, [projectId]);
 
-  // Auto-poll bot status until connected so dashboard updates immediately
+  // Track previous tab to release session to standby if user leaves WA Blast before connecting
+  const prevActiveTabRef = useRef(activeTab);
   useEffect(() => {
+    if (prevActiveTabRef.current === 'blast' && activeTab !== 'blast') {
+      if (waSession?.status !== 'connected' && botChannelRef.current) {
+        botChannelRef.current.send({
+          type: 'broadcast',
+          event: 'close_session',
+          payload: { projectId }
+        }).catch(() => {});
+      }
+    }
+    prevActiveTabRef.current = activeTab;
+  }, [activeTab, waSession?.status, projectId]);
+
+  // Request & poll QR code ONLY when user is actively inside the WA Blast tab and not connected
+  useEffect(() => {
+    if (activeTab !== 'blast') return;
     if (waSession?.status === 'connected') return;
 
     const checkStatus = () => {
@@ -408,9 +424,9 @@ export default function RSVPDashboard() {
     };
 
     checkStatus();
-    const interval = setInterval(checkStatus, 2000);
+    const interval = setInterval(checkStatus, 2500);
     return () => clearInterval(interval);
-  }, [waSession?.status, waSession?.qrCodeValue, projectId]);
+  }, [activeTab, waSession?.status, waSession?.qrCodeValue, projectId]);
 
   // QR Refresh Countdown Timer
   useEffect(() => {
