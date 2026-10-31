@@ -1,6 +1,16 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'x-vercel-skip-toolbar', value: '1' },
+        ],
+      },
+    ];
+  },
   images: {
     unoptimized: true,
     formats: ['image/avif', 'image/webp'],

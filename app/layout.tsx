@@ -104,6 +104,38 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${customSerif.variable} ${customScript.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        {/* Suppress and remove Vercel Toolbar if injected */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var killToolbar = function() {
+                    var selectors = ['vercel-toolbar', 'v-toolbar', '#vercel-toolbar', 'vercel-live-feedback', 'iframe[src*="vercel.live"]', 'iframe[title*="Vercel Toolbar"]'];
+                    for (var i = 0; i < selectors.length; i++) {
+                      var els = document.querySelectorAll(selectors[i]);
+                      for (var j = 0; j < els.length; j++) {
+                        els[j].remove();
+                      }
+                    }
+                  };
+                  killToolbar();
+                  if (typeof MutationObserver !== 'undefined') {
+                    var observer = new MutationObserver(killToolbar);
+                    if (document.body) {
+                      observer.observe(document.body, { childList: true, subtree: true });
+                    } else {
+                      document.addEventListener('DOMContentLoaded', function() {
+                        if (document.body) observer.observe(document.body, { childList: true, subtree: true });
+                      });
+                    }
+                    setTimeout(function() { observer.disconnect(); }, 8000);
+                  }
+                } catch(e) {}
+              })();
+            `,
+          }}
+        />
         <ClientSecurity />
         {children}
       </body>

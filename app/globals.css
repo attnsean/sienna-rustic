@@ -126,3 +126,28 @@ body {
 .font-sr-sans {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
+
+
+/* Force completely remove and hide Vercel Toolbar across all pages and invitations */
+vercel-toolbar,
+v-toolbar,
+#vercel-toolbar,
+[id^="vercel-toolbar"],
+[id*="vercel-toolbar"],
+vercel-live-feedback,
+[class*="vercel-toolbar"],
+iframe[src*="vercel.live"],
+iframe[title*="Vercel Toolbar"] {
+  display: none !important;
+  visibility: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  max-width: 0 !important;
+  max-height: 0 !important;
+  position: absolute !important;
+  left: -9999px !important;
+  top: -9999px !important;
+  z-index: -999999 !important;
+}
