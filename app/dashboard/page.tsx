@@ -204,8 +204,7 @@ export default function RSVPDashboard() {
         ((rawPhoneDigits.startsWith("62") || rawPhoneDigits.startsWith("08")) && rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 15) ||
         ((rawNameDigits.startsWith("62") || rawNameDigits.startsWith("08")) && rawNameDigits.length >= 10 && rawNameDigits.length <= 15);
 
-      const isExplicitPersonal = idStr.endsWith("@c.us") || idStr.endsWith("@lid") || isIndoPhone;
-      const isGroup = !isExplicitPersonal && Boolean(idStr.endsWith("@g.us") || Boolean((c.id as any)?.server === "g.us"));
+      const isGroup = Boolean(c.isGroup || idStr.endsWith("@g.us") || Boolean((c.id as any)?.server === "g.us"));
 
       let realPhone = isGroup ? "" : (c.phone || (isIndoPhone ? (rawPhoneDigits.length >= 10 ? rawPhoneDigits : rawNameDigits) : ""));
       let displayName = (c.name || "").trim();
@@ -295,12 +294,8 @@ export default function RSVPDashboard() {
             const idStr = String(c.id || '');
             const rawPhoneDigits = String(c.phone || '').replace(/[^0-9]/g, '');
             const rawNameDigits = String(c.name || '').replace(/[^0-9]/g, '');
-            const isIndoPhone =
-              ((rawPhoneDigits.startsWith('62') || rawPhoneDigits.startsWith('08')) && rawPhoneDigits.length >= 10 && rawPhoneDigits.length <= 15) ||
-              ((rawNameDigits.startsWith('62') || rawNameDigits.startsWith('08')) && rawNameDigits.length >= 10 && rawNameDigits.length <= 15);
-
-            const isExplicitPersonal = idStr.endsWith('@c.us') || idStr.endsWith('@lid') || isIndoPhone;
-            const isGroup = !isExplicitPersonal && Boolean(
+            const isGroup = Boolean(
+              c.isGroup ||
               idStr.endsWith('@g.us') ||
               Boolean((c.id as any)?.server === 'g.us')
             );
@@ -324,7 +319,7 @@ export default function RSVPDashboard() {
             return {
               id: idStr,
               name: displayName,
-              phone: isGroup ? '' : formatIndonesianPhone(realPhone),
+              phone: isGroup ? '' : (realPhone ? formatIndonesianPhone(realPhone) : ''),
               isGroup: isGroup,
               category: (isGroup ? 'Grup WhatsApp' : 'Kontak Pribadi') as any,
               avatarUrl: c.profilePicUrl || undefined
@@ -791,19 +786,44 @@ export default function RSVPDashboard() {
   };
 
   const filteredContactsList = useMemo(() => {
+    const cleanStr = (s: string) =>
+      (s || '')
+        .normalize('NFKD')
+        .replace(/[\u200B-\u200D\uFEFF]/g, '')
+        .toLowerCase();
+
+    const fuzzyClean = (s: string) =>
+      cleanStr(s)
+        .replace(/[^\p{L}\p{N}\s]/gu, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    const rawQuery = (waContactsSearch || '').trim();
+    const queryLower = cleanStr(rawQuery);
+    const queryFuzzy = fuzzyClean(rawQuery);
+    const queryDigits = rawQuery.replace(/[^0-9]/g, '');
+
     return (waContacts || []).filter((c) => {
       if (waContactsCategory === 'Grup WhatsApp') {
         if (!c.isGroup) return false;
       } else if (waContactsCategory === 'Kontak Pribadi') {
         if (c.isGroup) return false;
       }
-      if (waContactsSearch.trim()) {
-        const query = waContactsSearch.toLowerCase();
-        const matchName = (c.name || '').toLowerCase().includes(query);
-        const matchPhone = (c.phone || '').toLowerCase().includes(query);
-        return matchName || matchPhone;
-      }
-      return true;
+
+      if (!rawQuery) return true;
+
+      const cName = c.name || '';
+      const cNameLower = cleanStr(cName);
+      const cNameFuzzy = fuzzyClean(cName);
+      const cPhone = (c.phone || '').replace(/[^0-9]/g, '');
+
+      const matchName =
+        cNameLower.includes(queryLower) ||
+        (queryFuzzy.length > 0 && cNameFuzzy.includes(queryFuzzy));
+
+      const matchPhone = !c.isGroup && queryDigits.length >= 3 && cPhone.includes(queryDigits);
+
+      return matchName || matchPhone;
     });
   }, [waContacts, waContactsCategory, waContactsSearch]);
 
