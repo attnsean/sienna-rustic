@@ -30,7 +30,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const groomNickname = project?.groom_nickname || "Marvel";
   const brideFull = project?.bride_name || "Nathalie";
   const groomFull = project?.groom_name || "Marvel";
-  const isDemo = !project || (!project.id && !project.project_name);
+  const isDemo = !project?.id || project?.id === "default" || (typeof project?.project_name === "string" && project.project_name.toLowerCase() === "sienna-rustic");
   const brideFather = isDemo ? "Bpk. Orang Tua" : ((project as any)?.bride_father?.trim() || "");
   const brideMother = isDemo ? "Ibu Orang Tua" : ((project as any)?.bride_mother?.trim() || "");
   const brideIg = (project as any)?.bride_instagram ? (project as any).bride_instagram.replace("@", "") : "";
@@ -92,7 +92,6 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     }
   ];
 
-  const isDemo = !project?.id || project?.id === "default" || (typeof project?.project_name === "string" && project.project_name.toLowerCase() === "sienna-rustic");
   const userLoveStories = Array.isArray((project as any)?.love_story_items) && (project as any).love_story_items.length > 0
     ? (project as any).love_story_items.map((item: any, idx: number) => ({
         id: item.id || String(idx + 1),
