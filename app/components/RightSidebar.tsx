@@ -30,11 +30,12 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const groomNickname = project?.groom_nickname || "Marvel";
   const brideFull = project?.bride_name || "Nathalie";
   const groomFull = project?.groom_name || "Marvel";
-  const brideFather = (project as any)?.bride_father || "Bpk. Orang Tua";
-  const brideMother = (project as any)?.bride_mother || "Ibu Orang Tua";
+  const isDemo = !project || (!project.id && !project.project_name);
+  const brideFather = isDemo ? "Bpk. Orang Tua" : ((project as any)?.bride_father?.trim() || "");
+  const brideMother = isDemo ? "Ibu Orang Tua" : ((project as any)?.bride_mother?.trim() || "");
   const brideIg = (project as any)?.bride_instagram ? (project as any).bride_instagram.replace("@", "") : "";
-  const groomFather = (project as any)?.groom_father || "Bpk. Orang Tua";
-  const groomMother = (project as any)?.groom_mother || "Ibu Orang Tua";
+  const groomFather = isDemo ? "Bpk. Orang Tua" : ((project as any)?.groom_father?.trim() || "");
+  const groomMother = isDemo ? "Ibu Orang Tua" : ((project as any)?.groom_mother?.trim() || "");
   const groomIg = (project as any)?.groom_instagram ? (project as any).groom_instagram.replace("@", "") : "";
 
   // Helper to format parent names without duplicate prefix
@@ -933,7 +934,13 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Wanita</p>
-                <p className="text-[11px] leading-tight">Putri dari {formatParentName(brideFather, "Bapak")}{brideFatherDeceased ? " (Alm)" : ""} &amp; {formatParentName(brideMother, "Ibu")}{brideMotherDeceased ? " (Almh)" : ""}</p>
+                {Boolean(brideFather || brideMother) && (
+                  <p className="text-[11px] leading-tight">
+                    Putri dari {brideFather ? `${formatParentName(brideFather, "Bapak")}${brideFatherDeceased ? " (Alm)" : ""}` : ""}
+                    {Boolean(brideFather && brideMother) ? " & " : ""}
+                    {brideMother ? `${formatParentName(brideMother, "Ibu")}${brideMotherDeceased ? " (Almh)" : ""}` : ""}
+                  </p>
+                )}
               </div>
 
               {brideIg && (
@@ -982,7 +989,13 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
               <div className="space-y-0.5 text-xs text-[#5C4A40] font-sr-sans">
                 <p className="font-semibold text-[11px]">Mempelai Pria</p>
-                <p className="text-[11px] leading-tight">Putra dari {formatParentName(groomFather, "Bapak")}{groomFatherDeceased ? " (Alm)" : ""} &amp; {formatParentName(groomMother, "Ibu")}{groomMotherDeceased ? " (Almh)" : ""}</p>
+                {Boolean(groomFather || groomMother) && (
+                  <p className="text-[11px] leading-tight">
+                    Putra dari {groomFather ? `${formatParentName(groomFather, "Bapak")}${groomFatherDeceased ? " (Alm)" : ""}` : ""}
+                    {Boolean(groomFather && groomMother) ? " & " : ""}
+                    {groomMother ? `${formatParentName(groomMother, "Ibu")}${groomMotherDeceased ? " (Almh)" : ""}` : ""}
+                  </p>
+                )}
               </div>
 
               {groomIg && (
