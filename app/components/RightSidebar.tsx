@@ -1842,17 +1842,19 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                         </div>
 
                         {/* Attendance Badge */}
-                        {item.attendance === "hadir" ? (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF7EE] text-[#1E6B35] border border-[#A3E4B5]/60 flex items-center gap-1 shrink-0">
-                            <span>✓</span>
-                            <span>Hadir{item.pax ? ` (${item.pax})` : ""}</span>
-                          </span>
-                        ) : (
-                          <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#FAECE7] text-[#B03A2E] border border-[#F5C6CB] flex items-center gap-1 shrink-0">
-                            <span>✕</span>
-                            <span>Tidak Hadir</span>
-                          </span>
-                        )}
+                        {item.attendance ? (
+                          item.attendance === "hadir" ? (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#EBF7EE] text-[#1E6B35] border border-[#A3E4B5]/60 flex items-center gap-1 shrink-0">
+                              <span>✓</span>
+                              <span>Hadir{item.pax ? ` (${item.pax})` : ""}</span>
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-semibold bg-[#FAECE7] text-[#B03A2E] border border-[#F5C6CB] flex items-center gap-1 shrink-0">
+                              <span>✕</span>
+                              <span>Tidak Hadir</span>
+                            </span>
+                          )
+                        ) : null}
                       </div>
 
                       {/* Message Content */}
