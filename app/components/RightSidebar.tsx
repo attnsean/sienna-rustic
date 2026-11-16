@@ -119,13 +119,14 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
     }
   ];
 
-  const paymentAccounts = Array.isArray((project as any)?.payment_accounts) && (project as any).payment_accounts.length > 0
-    ? (project as any).payment_accounts
-    : defaultPaymentAccounts;
+  const packageHasCashless = (project as any)?.subscriptions?.packages?.has_amplop_digital ?? true;
+  const isCashlessActive = isDemo ? true : (((project as any)?.has_cashless === true) || (packageHasCashless && (project as any)?.has_cashless !== false));
 
-  const physicalGiftAddress = (project as any)?.wishlist_note 
-    || (project as any)?.venue_address 
-    || (events && events.length > 0 ? (events[0].venue_address || events[0].venue_name) : "") || "";
+  const paymentAccounts = (isCashlessActive && Array.isArray((project as any)?.payment_accounts) && (project as any).payment_accounts.length > 0)
+    ? (project as any).payment_accounts
+    : (isDemo ? defaultPaymentAccounts : []);
+
+  const physicalGiftAddress = (project as any)?.wishlist_note?.trim() || (isDemo ? "Jl. Kemuning I, Cugenang, Cianjur" : "");
 
   // Dynamic Events List
   const defaultEvents = [
@@ -1427,6 +1428,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
         {/* ===================================================================== */}
         {/* SECTION 8 - WEDDING GIFT / AMPLOP DIGITAL (Matching Referensi Gambar 3 Bawah) */}
         {/* ===================================================================== */}
+        {isCashlessActive && (paymentAccounts.length > 0 || Boolean(physicalGiftAddress) || isDemo) && (
         <section 
           id="gift-section"
           className="relative w-full px-5 sm:px-6 py-14 overflow-hidden select-none bg-[#8A4B32] text-white"
@@ -1553,34 +1555,37 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
               })}
 
               {/* Physical Gift Option / Kirim Kado Fisik */}
-              <motion.div
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: false, amount: 0.2 }}
-                transition={{ duration: 0.6 }}
-                className="rounded-2xl p-4 bg-white/10 border border-white/20 text-center max-w-xs mx-auto space-y-2 backdrop-blur-sm"
-              >
-                <div className="flex items-center justify-center gap-1.5 text-xs text-[#E6C280] font-bold uppercase tracking-wider">
-                  <span>🎁</span>
-                  <span>Kirim Kado Fisik</span>
-                </div>
-                <p className="text-[11px] text-white/90 leading-relaxed">
-                  {physicalGiftAddress}
-                </p>
-                <button
-                  type="button"
-                  onClick={() => copyAddress(physicalGiftAddress)}
-                  className="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 text-white text-[11px] px-3.5 py-1.5 rounded-full border border-white/20 transition-all cursor-pointer"
+              {Boolean(physicalGiftAddress) && (
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: false, amount: 0.2 }}
+                  transition={{ duration: 0.6 }}
+                  className="rounded-2xl p-4 bg-white/10 border border-white/20 text-center max-w-xs mx-auto space-y-2 backdrop-blur-sm"
                 >
-                  <span>{copiedAddress ? "✓" : "📦"}</span>
-                  <span>{copiedAddress ? "Alamat Tersalin!" : "Salin Alamat"}</span>
-                </button>
-              </motion.div>
+                  <div className="flex items-center justify-center gap-1.5 text-xs text-[#E6C280] font-bold uppercase tracking-wider">
+                    <span>🎁</span>
+                    <span>Kirim Kado Fisik</span>
+                  </div>
+                  <p className="text-[11px] text-white/90 leading-relaxed">
+                    {physicalGiftAddress}
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => copyAddress(physicalGiftAddress)}
+                    className="inline-flex items-center gap-1 bg-white/15 hover:bg-white/25 text-white text-[11px] px-3.5 py-1.5 rounded-full border border-white/20 transition-all cursor-pointer"
+                  >
+                    <span>{copiedAddress ? "✓" : "📦"}</span>
+                    <span>{copiedAddress ? "Alamat Tersalin!" : "Salin Alamat"}</span>
+                  </button>
+                </motion.div>
+              )}
 
             </div>
 
           </div>
         </section>
+        )}
 
         {/* ===================================================================== */}
         {/* SECTION 9 - UCAPAN & RSVP (Matching Referensi Gambar 4) */}
