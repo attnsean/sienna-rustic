@@ -156,13 +156,17 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
 
   const eventsList = events && events.length > 0
     ? events.map((ev: any, idx: number) => {
-        const isSakral = ev.event_type === "akad" || ev.event_type === "pemberkatan";
-        const label = ev.custom_label || (
-          ev.event_type === "akad" ? "Akad Nikah" :
+        const isSakral = ev.event_type === "akad" || ev.event_type === "pemberkatan" || ev.event_type === "pawiwahan";
+        const label = (ev.event_type === "custom" && ev.custom_label) ? ev.custom_label : (
+          ev.event_type === "akad" ? (ev.custom_label && !ev.custom_label.toLowerCase().includes("resepsi") ? ev.custom_label : "Akad Nikah") :
           ev.event_type === "pemberkatan" ? "Pemberkatan Nikah" :
-          ev.event_type === "resepsi" ? "Resepsi" :
+          ev.event_type === "resepsi" ? (ev.custom_label && !ev.custom_label.toLowerCase().includes("akad") && !ev.custom_label.toLowerCase().includes("pemberkatan") ? ev.custom_label : "Resepsi") :
           ev.event_type === "unduh_mantu" ? "Unduh Mantu" :
-          "Acara Spesial"
+          ev.event_type === "siraman" ? "Siraman" :
+          ev.event_type === "midodareni" ? "Midodareni" :
+          ev.event_type === "pengajian" ? "Pengajian" :
+          ev.event_type === "pawiwahan" ? "Pawiwahan" :
+          (ev.custom_label || "Acara Spesial")
         );
         const timeStr = ev.event_time 
           ? ('Pukul ' + ev.event_time.slice(0, 5) + (ev.end_time ? ' - ' + ev.end_time.slice(0, 5) : ' - Selesai') + ' WIB')
