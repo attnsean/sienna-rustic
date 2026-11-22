@@ -2,8 +2,8 @@ import nodemailer from "nodemailer";
 import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://ujiqdozsipxwjrugtsgd.supabase.co";
-const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "sb_publishable_jfhrpcWLhECHJEnE1AhiaQ_zgDT7D4R";
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://sdnuzcdcaxuydoyocqgj.supabase.co";
+const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || "sb_publishable_CakDY3TRcwAUw8FvXBynkw_PaeoCuGW";
 const supabaseAdmin = createClient(supabaseUrl, supabaseServiceRoleKey);
 
 // Initialize Nodemailer transporter with Gmail

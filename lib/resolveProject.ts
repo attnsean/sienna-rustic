@@ -1,7 +1,13 @@
+const rewriteToCdn = (url?: string | null): string => {
+  if (!url || typeof url !== 'string') return '';
+  return url
+    .replace(/https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\/undangan\//g, 'https://cdn.serastory.com/')
+    .replace(/https:\/\/[a-z0-9]+\.supabase\.co\/storage\/v1\/object\/public\//g, 'https://cdn.serastory.com/');
+};
 import { supabase as publicSupabase } from './supabase';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://ujiqdozsipxwjrugtsgd.supabase.co';
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || 'https://sdnuzcdcaxuydoyocqgj.supabase.co';
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Use admin client if running on server with service role key to bypass RLS for subscriptions
@@ -227,11 +233,22 @@ export async function resolveProjectData(slug?: string, host?: string, requested
     if (projectId) {
       const { data: projectData, error: projectError } = await supabase
         .from('projects')
-        .select('*, subscriptions(status, expires_at, packages(*))')
+        .select('*')
         .eq('id', projectId)
         .maybeSingle();
 
       if (projectData && !projectError) {
+        let subscriptionData: any = null;
+        if (projectData.subscription_id) {
+          try {
+            const { data: sub } = await supabase
+              .from('subscriptions')
+              .select('status, expires_at, packages(*)')
+              .eq('id', projectData.subscription_id)
+              .maybeSingle();
+            subscriptionData = sub;
+          } catch {}
+        }
         const { data: weddingData } = await supabase
           .from('wedding_details')
           .select('*')
@@ -352,6 +369,22 @@ export async function resolveProjectData(slug?: string, host?: string, requested
     }
   } catch (error) {
     console.error('Error resolving project data from Supabase:', error);
+  }
+
+  if (result.project) {
+    const p = result.project as any;
+    if (p.cover_photo_url) p.cover_photo_url = rewriteToCdn(p.cover_photo_url);
+    if (p.opening_photo_url) p.opening_photo_url = rewriteToCdn(p.opening_photo_url);
+    if (p.bride_photo_url) p.bride_photo_url = rewriteToCdn(p.bride_photo_url);
+    if (p.groom_photo_url) p.groom_photo_url = rewriteToCdn(p.groom_photo_url);
+    if (p.music_url) p.music_url = rewriteToCdn(p.music_url);
+    if (Array.isArray(p.gallery_photos)) {
+      p.gallery_photos = p.gallery_photos.map((item: any) => {
+        if (typeof item === 'string') return rewriteToCdn(item);
+        if (item && item.url) return { ...item, url: rewriteToCdn(item.url) };
+        return item;
+      });
+    }
   }
 
   return result;

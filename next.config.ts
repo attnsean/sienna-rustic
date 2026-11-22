@@ -20,6 +20,10 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
+        hostname: 'cdn.serastory.com',
+      },
+      {
+        protocol: 'https',
         hostname: '**.r2.dev',
       },
       {

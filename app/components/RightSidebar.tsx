@@ -104,20 +104,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
   const loveStories = userLoveStories;
 
   // Dynamic Payment Accounts
-  const defaultPaymentAccounts = [
-    {
-      type: "bank",
-      provider: "BCA",
-      account_number: "3480 9948 75",
-      account_name: brideNickname || "Sopiah"
-    },
-    {
-      type: "bank",
-      provider: "Mandiri",
-      account_number: "131 00 1839281 9",
-      account_name: groomNickname || "Marvel"
-    }
-  ];
+  const defaultPaymentAccounts: any[] = [];
 
   const packageHasCashless = (project as any)?.subscriptions?.packages?.has_amplop_digital ?? true;
   const isCashlessActive = isDemo ? true : (((project as any)?.has_cashless === true) || (packageHasCashless && (project as any)?.has_cashless !== false));
@@ -1135,7 +1122,7 @@ export default function RightSidebar({ guestName, guest, project, events, wishes
                         target="_blank" 
                         rel="noreferrer"
                         className="inline-flex items-center gap-2 bg-[#8A4B32] hover:bg-[#733B26] text-white font-sr-sans text-xs font-semibold px-6 py-2.5 rounded-full shadow-md active:scale-95 transition-all"
-                      >
+                       onClick={(e) => { e.stopPropagation(); window.open(ev.venue_maps_url, "_blank", "noopener,noreferrer"); }} >
                         <svg className="w-3.5 h-3.5 text-[#E6C280]" viewBox="0 0 24 24" fill="currentColor">
                           <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
                         </svg>
